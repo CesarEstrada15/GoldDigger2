@@ -5,16 +5,36 @@ using UnityEngine.UI;
 
 public class moveExcavator : MonoBehaviour
 {
-    int speed = 10;
 
+    //game oBjects
+    private Rigidbody2D rb2d;
+    [SerializeField] public healthbarController healthbar;
+    [SerializeField] public healthbarController gasResource;
+
+    [SerializeField] public GameObject greenCrawler;
+    [SerializeField] public GameObject purpleCrawler;
+    [SerializeField] public GameObject orangeCrawler;
+
+    //Excavator capabilities
+    int speed = 10;
+    private int health = 100;
+
+    //Resources
     int bronzeScore = 0;
     int silverScore = 0;
     int goldScore = 0;
+    int gas = 100;
+
+    //UI
     Canvas can;
     Text bronzeTxt;
     Text silverTxt;
     Text goldTxt;
-    private Rigidbody2D rb2d;
+
+    //Useful variable
+    private float depletionRate = 0.0001f;
+    
+    
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +59,15 @@ public class moveExcavator : MonoBehaviour
         {
           
         }
+        if (gasResource.currentSize > 0)
+        {
+            gasResource.setSize(gasResource.currentSize - depletionRate);
+            
+        } else
+        {
+            //End Game cause you ran out of fuel
+            Application.Quit();
+        }
        
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -46,7 +75,8 @@ public class moveExcavator : MonoBehaviour
         if (collision.gameObject.tag == "Target")
         {
             float temp = Random.value;
-            if (collision.gameObject.transform.position.y > -50)
+            
+            if (collision.gameObject.transform.position.y > -35)
             {
                 
                 if(temp > 0.95)
@@ -58,12 +88,20 @@ public class moveExcavator : MonoBehaviour
                     {
                         silverScore++;
                     }
-                    else
-                    {
+                   else if (temp > 0.99){
                         goldScore++;
+                        if(temp > 0.995)
+                        {
+                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                        }
+
+                    } else
+                    {
+
                     }
-                }
-            } else if(collision.gameObject.transform.position.y < -50 && collision.gameObject.transform.position.y > -100)
+                } 
+               
+            } else if(collision.gameObject.transform.position.y < -35 && collision.gameObject.transform.position.y > -60)
             {
                 if (temp > 0.90)
                 {
@@ -75,13 +113,22 @@ public class moveExcavator : MonoBehaviour
                     {
                         silverScore++;
                     }
-                    else
+                    else if (temp > 0.98)
                     {
                         goldScore++;
+                        if (temp > 0.99)
+                        {
+                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                        }
+
+                    }
+                    else
+                    {
+
                     }
                 }
             }
-            else if(collision.gameObject.transform.position.y < -100 && collision.gameObject.transform.position.y > -150)
+            else if(collision.gameObject.transform.position.y < -60 && collision.gameObject.transform.position.y > -75)
             {
                 if (temp > 0.85)
                 {
@@ -93,9 +140,18 @@ public class moveExcavator : MonoBehaviour
                     {
                         silverScore++;
                     }
-                    else
+                    else if (temp > 0.97)
                     {
                         goldScore++;
+                        if (temp > 0.975)
+                        {
+                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                        }
+
+                    }
+                    else
+                    {
+
                     }
                 }
             }
@@ -111,13 +167,49 @@ public class moveExcavator : MonoBehaviour
                     {
                         silverScore++;
                     }
-                    else
+                    else if (temp > 0.95)
                     {
                         goldScore++;
+                        if (temp > 0.965)
+                        {
+                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                        }
+
+                    }
+                    else
+                    {
+
                     }
                 }
             }
             updateText();
+            Destroy(collision.gameObject);
+        }
+
+        if(collision.gameObject.tag == "GAS")
+        {
+            gasResource.currentSize = 1;
+            gasResource.setSize(1);
+            Destroy(collision.gameObject);
+            depletionRate = depletionRate * 2;
+        }
+
+        if (collision.gameObject.tag == "greenCrawler") 
+        {
+            
+            if (health > 10)
+            {
+                Debug.Log(health);
+                health = health - 10;
+                healthbar.setSize(healthbar.currentSize - .1f);
+                healthbar.currentSize -= 0.05f;
+                
+            }
+            else
+            {
+                Application.Quit();
+            }
+            
             Destroy(collision.gameObject);
         }
     }
