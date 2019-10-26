@@ -16,7 +16,7 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject orangeCrawler;
 
     //Excavator capabilities
-    int speed = 10;
+    int speed = 5;
     private int health = 100;
 
     //Resources
