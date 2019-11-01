@@ -14,7 +14,7 @@ public class crawlerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target != null)
+        if (target != null && target.GetComponent<moveExcavator>().paused != true) 
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, 0.01f);
            // transform.LookAt(target.transform);
