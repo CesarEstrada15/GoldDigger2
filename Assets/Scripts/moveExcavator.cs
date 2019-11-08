@@ -8,9 +8,12 @@ public class moveExcavator : MonoBehaviour
 
     //game oBjects
     private Rigidbody2D rb2d;
+    [SerializeField] public Camera cam;
     [SerializeField] public healthbarController healthbar;
     [SerializeField] public healthbarController gasResource;
+    [SerializeField] public GameObject projectile;
 
+    [SerializeField] public GameObject crosshair;
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
@@ -50,6 +53,12 @@ public class moveExcavator : MonoBehaviour
     //Useful variable
     private float depletionRate = 0.0001f;
     public bool paused = false;
+
+
+    //GUN VARIABLES
+    //TEST TEST TEST TEST
+    public bool gunActivated = false;
+    private Vector2 mousePos;
 
     //Leveling
     private int speedLvl = 1;
@@ -112,7 +121,8 @@ public class moveExcavator : MonoBehaviour
         wpc.silver = 13;
         wpc.gold = 11;
 
-        
+        Cursor.visible = false;
+        crosshair.SetActive(false);
     }
 
     // Update is called once per frame
@@ -147,7 +157,7 @@ public class moveExcavator : MonoBehaviour
             panel.SetActive(!panelActive);
             mainUI.SetActive(panelActive);
             panelActive = !panelActive;
-            
+            Cursor.visible = !Cursor.visible;
             paused = !paused;
 
             if (paused)
@@ -155,11 +165,32 @@ public class moveExcavator : MonoBehaviour
                 updateTextUpgrades();
             }
         }
+
+        //If guns are active move crosshair to mouse at all times
+        if (gunActivated == true)
+        {
+            
+            crosshair.SetActive(true);
+            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
+
+            if (Input.GetButtonDown("Fire1"))
+            {
+                GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+
+            go.GetComponent<projectileMove>().getProjectieInfo(crosshair.transform.position, 10, 0.1f,this.gameObject);
+            }
+          
+        }
+
+
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Target")
         {
+            
             float temp = Random.value;
             
             if (collision.gameObject.transform.position.y > -35)
@@ -178,12 +209,15 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if(temp > 0.995)
                         {
-                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            
+                                Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            
+                           
                         }
 
                     } else
                     {
-
+                       
                     }
                 } 
                
@@ -202,9 +236,12 @@ public class moveExcavator : MonoBehaviour
                     else if (temp > 0.98)
                     {
                         goldScore++;
-                        if (temp > 0.99)
+                        if (temp > 0.985)
                         {
-                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            
+                                Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            
+                           
                         }
 
                     }
@@ -231,7 +268,7 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if (temp > 0.975)
                         {
-                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
                         }
 
                     }
@@ -258,7 +295,7 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if (temp > 0.965)
                         {
-                            Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
                         }
 
                     }
@@ -277,17 +314,16 @@ public class moveExcavator : MonoBehaviour
             gasResource.currentSize = 1;
             gasResource.setSize(1);
             Destroy(collision.gameObject);
-            depletionRate = depletionRate * 2;
+            //depletionRate = depletionRate * 2;
         }
 
         if (collision.gameObject.tag == "greenCrawler") 
         {
             
-            if (health > 10)
+            if (health > 15)
             {
                 Debug.Log(health);
-                health = health - 10;
-                healthbar.setSize((float)health/maxHealth);
+                this.takeDamage(15);
                 Debug.Log((float)health / maxHealth);
                 
             }
@@ -297,6 +333,37 @@ public class moveExcavator : MonoBehaviour
             }
             
             Destroy(collision.gameObject);
+        }
+        if (collision.gameObject.tag == "orangeCrawler")
+        {
+
+            if (health > 30)
+            {
+
+                this.takeDamage(30);
+                
+
+            }
+            else
+            {
+                Application.Quit();
+            }
+
+            Destroy(collision.gameObject);
+        }
+        if(collision.gameObject.tag == "LeftBoss")
+        {
+            if (health > 75)
+            {
+
+                this.takeDamage(75);
+
+
+            }
+            else
+            {
+                Application.Quit();
+            }
         }
     }
 
@@ -320,46 +387,85 @@ public class moveExcavator : MonoBehaviour
         {
             switch(speedLvl){
                 case 1:
-                    speed += 1;
-                    speedLvl++;
-                    spc.bronze += 4;
-                    spc.silver += 3;
-                    spc.gold += 2;
+                    if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
+                    {
+                        speed += 1;
+                        speedLvl++;
+                        discountCost(a);
+                        spc.bronze += 4;
+                        spc.silver += 3;
+                        spc.gold += 2;
 
+                    }
                     break;
                 case 2:
-                    speed += 2;
-                    speedLvl++;
-                    spc.bronze += 5;
-                    spc.silver += 3;
-                    spc.gold += 2;
+                    if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
+                    {
+                        speed += 2;
+                        speedLvl++;
+                        discountCost(a);
+                        spc.bronze += 5;
+                        spc.silver += 3;
+                        spc.gold += 2;
+                    }
                     break;
                 case 3:
-                    speed += 3;
-                    speedLvl++;
-                    spc.bronze = 0;
-                    spc.silver = 0;
-                    spc.gold = 0;
-                    speedlvltxt.text = "MAX";
+                    if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
+                    {
+                        speed += 3;
+                        speedLvl++;
+                        discountCost(a);
+                        spc.bronze = 0;
+                        spc.silver = 0;
+                        spc.gold = 0;
+                        speedlvltxt.text = "MAX";
+                    }
                     break;
             }
-            updateCostText(a);
+            
             speedlvltxt.text = speedLvl.ToString();
         } else if ( a == 1) //LR leveler
         {
             switch (LRlvl)
             {
                 case 1:
-                    spotLight.spotAngle += 3;
-                    LRlvl++;
+                    
+                    if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
+                    {
+                        spotLight.spotAngle += 3;
+                        LRlvl++;
+                        discountCost(a);
+                        lrc.bronze += 4;
+                        lrc.silver += 3;
+                        lrc.gold += 2;
+
+                    }
                     break;
                 case 2:
-                    spotLight.spotAngle += 4;
-                    LRlvl++;
+                   
+                    if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
+                    {
+                        spotLight.spotAngle += 4;
+                        LRlvl++;
+                        discountCost(a);
+                        lrc.bronze += 4;
+                        lrc.silver += 3;
+                        lrc.gold += 2;
+
+                    }
                     break;
                 case 3:
-                    spotLight.spotAngle += 5;
-                    LRlvl++;
+                    if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
+                    {
+                        spotLight.spotAngle += 5;
+                        LRlvl++;
+                        discountCost(a);
+                        lrc.bronze = 0;
+                        lrc.silver = 0;
+                        lrc.gold = 0;
+                        LRlvltxt.text = "MAX";
+
+                    }
                     break;
             }
             LRlvltxt.text = LRlvl.ToString();
@@ -369,33 +475,58 @@ public class moveExcavator : MonoBehaviour
             switch (healthlvl)
             {
                 case 1:
-                    maxHealth = 120;
-                    health = maxHealth;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        maxHealth = 120;
+                        health = maxHealth;
+                        healthbar.setSize(1f);
+                        healthlvl++;
+                        discountCost(a);
+                        hpc.bronze += 4;
+                        hpc.silver += 3;
+                        hpc.gold += 2;
+                    }
                     break;
                 case 2:
-                    maxHealth = 150;
-                    health = maxHealth;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        maxHealth = 150;
+                        health = maxHealth;
+                        healthbar.setSize(1f);
+                        healthlvl++;
+                        discountCost(a);
+                        hpc.bronze += 4;
+                        hpc.silver += 3;
+                        hpc.gold += 2;
+                    }
                     break;
                 case 3:
-                    maxHealth = 200;
-                    health = maxHealth;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        maxHealth = 200;
+                        health = maxHealth;
+                        healthbar.setSize(1f);
+                        healthlvl++;
+                        discountCost(a);
+                        hpc.bronze = 0;
+                        hpc.silver = 0;
+                        hpc.gold = 0;
+                        hplvltxt.text = "MAX";
+                    }
                     break;
             }
             hplvltxt.text = healthlvl.ToString();
-        } else
+        } else if (a == 3)
         {
             switch (weaponlvl)
             {
                 case 0:
-                    health = 120;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    gunActivated = true;
+                    weaponlvl++;
+                    discountCost(a);
+                    wpc.bronze += 999;
+                    wpc.silver += 999;
+                    wpc.gold += 999;
                     break;
                 case 1:
                     health = 150;
@@ -409,7 +540,12 @@ public class moveExcavator : MonoBehaviour
                     break;
             }
             weaponlvltxt.text = weaponlvl.ToString();
+            
         }
+        updateCostText(a);
+        updateTextMainUI();
+        updateTextUpgrades();
+          
     }
 
     public void updateCostText(int a)
@@ -439,5 +575,35 @@ public class moveExcavator : MonoBehaviour
         }
     }
 
+    public void takeDamage(int dmg)
+    {
+        health -= dmg;
+        healthbar.setSize((float)health / maxHealth);
 
+    }
+
+    public void discountCost(int a)
+    {
+        if(a == 0)
+        {
+            bronzeScore -= spc.bronze;
+            silverScore -= spc.silver;
+            goldScore -= spc.gold;
+        } else if ( a == 1)
+        {
+            bronzeScore -= lrc.bronze;
+            silverScore -= lrc.silver;
+            goldScore -= lrc.gold;
+        } else if( a == 2)
+        {
+            bronzeScore -= hpc.bronze;
+            silverScore -= hpc.silver;
+            goldScore -= hpc.gold;
+        } else if (a == 3)
+        {
+            bronzeScore -= wpc.bronze;
+            silverScore -= wpc.silver;
+            goldScore -= wpc.gold;
+        }
+    }
 }

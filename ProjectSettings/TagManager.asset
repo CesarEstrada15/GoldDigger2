@@ -7,6 +7,10 @@ TagManager:
   - Target
   - GAS
   - greenCrawler
+  - purpleCrawler
+  - orangeCrawler
+  - Undefined
+  - LeftBoss
   layers:
   - Default
   - TransparentFX
