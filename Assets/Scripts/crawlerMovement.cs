@@ -6,6 +6,7 @@ public class crawlerMovement : MonoBehaviour
 {
     private GameObject target;
     public GameObject projectile;
+    
     private int health;
     private float speed;
     float SavedTime = 0;
@@ -13,22 +14,24 @@ public class crawlerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         target = GameObject.Find("player");
         if(this.gameObject.tag == "greenCrawler")
         {
             health = 50;
-            speed = 0.01f;
-        } else if (this.gameObject.tag == "prupleCrawler")
+            speed = 0.015f;
+        } else if (this.gameObject.tag == "purpleCrawler")
         {
             health = 30;
-            speed = .05f;
+            speed = .02f;
         } else if (this.gameObject.tag == "orangeCrawler")
         {
             health = 80;
             speed = .03f;
         } else if (this.gameObject.tag == "LeftBoss")
         {
-            health = 1000;
+            
+            health = 500;
         }
     }
 
@@ -44,7 +47,7 @@ public class crawlerMovement : MonoBehaviour
                 float distanceToPlayer = (transform.position - target.transform.position).magnitude;
                 if(distanceToPlayer <= 15)
                 {
-
+                    
                     OnTriggerStay();
                 }
             }
@@ -83,5 +86,10 @@ public class crawlerMovement : MonoBehaviour
             print(DelayTime + " seconds have passed");
         }
 
+    }
+
+    public float getHealth()
+    {
+        return health;
     }
 }

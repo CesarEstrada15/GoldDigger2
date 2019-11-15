@@ -12,13 +12,17 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public healthbarController healthbar;
     [SerializeField] public healthbarController gasResource;
     [SerializeField] public GameObject projectile;
+    [SerializeField] public AudioClip all;
+    [SerializeField] public AudioClip boss;
 
+    
     [SerializeField] public GameObject crosshair;
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
 
     Light spotLight;
+    public AudioSource soundSource;
 
     //Excavator capabilities
     int speed = 2;
@@ -84,6 +88,7 @@ public class moveExcavator : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         mainUI = GameObject.Find("Canvas");
         panel = GameObject.Find("Panel");
+        soundSource = GameObject.Find("Sound").GetComponent<AudioSource>();
         spotLight = GameObject.Find("Spot Light").GetComponent<Light>();
         spotLight.type = LightType.Spot;
         Debug.Log(spotLight.spotAngle);
@@ -130,6 +135,7 @@ public class moveExcavator : MonoBehaviour
     {
         if (!paused)
         {
+            
             if (transform.position.y < 2.5)
             {
                 transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
@@ -153,7 +159,8 @@ public class moveExcavator : MonoBehaviour
         }
         if (Input.GetKeyDown("backspace"))
         {
-            Debug.Log("worked");
+            soundSource.mute = !soundSource.mute;
+          
             panel.SetActive(!panelActive);
             mainUI.SetActive(panelActive);
             panelActive = !panelActive;
@@ -209,10 +216,15 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if(temp > 0.995)
                         {
-                            
+                            if (this.gameObject.transform.position.x < 0)
+                            {
                                 Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
-                            
-                           
+                            }
+                            else
+                            {
+                                Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            }
+
                         }
 
                     } else
@@ -238,10 +250,14 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if (temp > 0.985)
                         {
-                            
+                            if (this.gameObject.transform.position.x < 0)
+                            {
                                 Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
-                            
-                           
+                            }
+                            else
+                            {
+                                Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            }
                         }
 
                     }
@@ -268,7 +284,18 @@ public class moveExcavator : MonoBehaviour
                         goldScore++;
                         if (temp > 0.975)
                         {
-                            Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            if (this.gameObject.transform.position.x < 0)
+                            {
+
+                                Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                                Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            }
+                            else
+                            {
+
+                                Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                                Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                            }
                         }
 
                     }
@@ -332,6 +359,23 @@ public class moveExcavator : MonoBehaviour
                 Application.Quit();
             }
             
+            Destroy(collision.gameObject);
+        }
+        if (collision.gameObject.tag == "purpleCrawler")
+        {
+
+            if (health > 20)
+            {
+                
+                this.takeDamage(20);
+                
+
+            }
+            else
+            {
+                Application.Quit();
+            }
+
             Destroy(collision.gameObject);
         }
         if (collision.gameObject.tag == "orangeCrawler")
@@ -521,12 +565,16 @@ public class moveExcavator : MonoBehaviour
             switch (weaponlvl)
             {
                 case 0:
-                    gunActivated = true;
-                    weaponlvl++;
-                    discountCost(a);
-                    wpc.bronze += 999;
-                    wpc.silver += 999;
-                    wpc.gold += 999;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        gunActivated = true;
+                        weaponlvl++;
+                        discountCost(a);
+                        wpc.bronze += 999;
+                        wpc.silver += 999;
+                        wpc.gold += 999;
+                        
+                    }
                     break;
                 case 1:
                     health = 150;

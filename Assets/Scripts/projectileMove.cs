@@ -44,21 +44,32 @@ public class projectileMove : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        
-        Debug.Log(target);
+       
+       
         if (Emitter != collision.gameObject)
         {
-            if (collision.gameObject.tag == "greenCrawler" || collision.gameObject.tag == "orangeCrawler")
+            //NEED TO MAKE ARRAY WITH ALL ENEMY GAMEOBJECTS
+            if (collision.gameObject.tag == "greenCrawler" || collision.gameObject.tag == "orangeCrawler" || collision.gameObject.tag == "purpleCrawler" || collision.gameObject.tag == "LeftBoss")
             {
-                Debug.Log("COLLIDEDMOSNTER");
+                Debug.Log(collision.gameObject.GetComponent<crawlerMovement>().getHealth());
                 collision.gameObject.GetComponent<crawlerMovement>().takeDamage(damage);
-                Destroy(this);
+                
+                Destroy(this.gameObject);
             }
             if (collision.gameObject.tag == "Player")
             {
                 collision.gameObject.GetComponent<moveExcavator>().takeDamage(damage);
-                Destroy(this);
+                Destroy(this.gameObject);
             }
         }
     }
+
+    IEnumerator ExecuteAfterTime(float time, GameObject go, Vector3 v)
+    {
+        yield return new WaitForSeconds(time);
+        go.transform.localScale = v;
+        // Code to execute after the delay
+    }
+
+    
 }

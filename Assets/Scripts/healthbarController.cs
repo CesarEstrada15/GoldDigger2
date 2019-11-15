@@ -19,6 +19,11 @@ public class healthbarController : MonoBehaviour
     {
         bar.localScale = new Vector3(sizeNormalized, 1f);
         currentSize = sizeNormalized;
+        if(currentSize < 0)
+        {
+            bar.localScale = new Vector3(0, 1f);
+            currentSize = 0;
+        }
     }
    
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class leftBossScript : MonoBehaviour
 {
     private GameObject player;
-    private int health = 1000;
+    private int health = 500;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,4 +30,6 @@ public class leftBossScript : MonoBehaviour
     {
         health -= dmg;
     }
-}
+
+    
+    }
