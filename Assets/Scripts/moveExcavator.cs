@@ -14,8 +14,11 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject projectile;
     [SerializeField] public AudioClip all;
     [SerializeField] public AudioClip boss;
+    [SerializeField] public GameObject overheat;
+    [SerializeField] public Joystick joystick;
+    [SerializeField] public Joystick joystickshoot;
 
-    
+
     [SerializeField] public GameObject crosshair;
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
@@ -38,6 +41,8 @@ public class moveExcavator : MonoBehaviour
     //UI
     GameObject panel;
     GameObject mainUI;
+    GameObject moveJoy;
+    GameObject shootJoy;
     Text bronzeTxt;
     Text silverTxt;
     Text goldTxt;
@@ -57,11 +62,15 @@ public class moveExcavator : MonoBehaviour
     //Useful variable
     private float depletionRate = 0.0001f;
     public bool paused = false;
+    private bool obsidianShield = false;
+    private bool excavate = true;
+    private bool overheating = false;
 
 
     //GUN VARIABLES
     //TEST TEST TEST TEST
     public bool gunActivated = false;
+    private bool shooting = false;
     private Vector2 mousePos;
 
     //Leveling
@@ -70,7 +79,8 @@ public class moveExcavator : MonoBehaviour
     private int healthlvl = 1;
     private int weaponlvl = 0;
 
-    public struct levelCost{
+    public struct levelCost
+    {
         public int bronze;
         public int silver;
         public int gold;
@@ -80,7 +90,7 @@ public class moveExcavator : MonoBehaviour
     levelCost lrc;
     levelCost hpc;
     levelCost wpc;
-   
+
 
     // Start is called before the first frame update
     void Start()
@@ -88,6 +98,8 @@ public class moveExcavator : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         mainUI = GameObject.Find("Canvas");
         panel = GameObject.Find("Panel");
+        moveJoy = GameObject.Find("JoyStickmove");
+        shootJoy = GameObject.Find("Joystickshoot");
         soundSource = GameObject.Find("Sound").GetComponent<AudioSource>();
         spotLight = GameObject.Find("Spot Light").GetComponent<Light>();
         spotLight.type = LightType.Spot;
@@ -109,37 +121,55 @@ public class moveExcavator : MonoBehaviour
         panel.SetActive(panelActive);
 
 
+
         //Setting initial leveling costs
         spc.bronze = 8;
-        spc.silver =5;
+        spc.silver = 5;
         spc.gold = 3;
 
         lrc.bronze = 10;
         lrc.silver = 7;
         lrc.gold = 6;
 
-        hpc.bronze =13;
+        hpc.bronze = 13;
         hpc.silver = 10;
         hpc.gold = 8;
 
-        wpc.bronze = 17;
-        wpc.silver = 13;
-        wpc.gold = 11;
+        wpc.bronze = 0;
+        wpc.silver = 0;
+        wpc.gold = 0;
 
         Cursor.visible = false;
         crosshair.SetActive(false);
+        overheat.SetActive(false);
+        shootJoy.SetActive(false);
+        gunActivated = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+
         if (!paused)
         {
-            
+            //Arrow movement
             if (transform.position.y < 2.5)
             {
-                transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
+                // transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
+                transform.Translate(joystick.Horizontal * speed * Time.deltaTime, joystick.Vertical * speed * Time.deltaTime, 0f);
             }
+            //Touch
+            /* if (Input.touchCount > 0) {
+
+                 Touch touch = Input.GetTouch(0);
+                 //Movement touch
+                 if(touch.position.x < 0)
+                 {
+
+                 }
+
+             }
+             */
             else
             {
 
@@ -155,15 +185,33 @@ public class moveExcavator : MonoBehaviour
                 Application.Quit();
             }
 
-           
+
+        }
+        if (transform.position.y <= -65 && obsidianShield == false)
+        {
+            excavate = false;
+            overheat.SetActive(true);
+            if (overheating == false)
+            {
+                overheating = true;
+                StartCoroutine("Overheat");
+            }
+
+        }
+        else
+        {
+            excavate = true;
+            overheat.SetActive(false);
         }
         if (Input.GetKeyDown("backspace"))
         {
             soundSource.mute = !soundSource.mute;
-          
+
             panel.SetActive(!panelActive);
             mainUI.SetActive(panelActive);
             panelActive = !panelActive;
+            moveJoy.SetActive(!moveJoy.active);
+
             Cursor.visible = !Cursor.visible;
             paused = !paused;
 
@@ -176,18 +224,17 @@ public class moveExcavator : MonoBehaviour
         //If guns are active move crosshair to mouse at all times
         if (gunActivated == true)
         {
-            
-            crosshair.SetActive(true);
-            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
 
-            if (Input.GetButtonDown("Fire1"))
+            //crosshair.SetActive(true);
+            shootJoy.SetActive(true);
+            //mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            //crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
+
+            if (joystickshoot.Horizontal != 0 && joystickshoot.Vertical != 0 && shooting == false)
             {
-                GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
-
-            go.GetComponent<projectileMove>().getProjectieInfo(crosshair.transform.position, 10, 0.1f,this.gameObject);
+                StartCoroutine("shoot");
             }
-          
+
         }
 
 
@@ -195,26 +242,28 @@ public class moveExcavator : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Target")
+        if (collision.gameObject.tag == "Target" && excavate)
         {
-            
+
             float temp = Random.value;
-            
+
             if (collision.gameObject.transform.position.y > -35)
             {
-                
-                if(temp > 0.95)
+
+                if (temp > 0.95)
                 {
-                    if(temp < 0.975)
+                    if (temp < 0.975)
                     {
                         bronzeScore++;
-                    } else if(temp > 0.975 && temp < 0.99)
+                    }
+                    else if (temp > 0.975 && temp < 0.99)
                     {
                         silverScore++;
                     }
-                   else if (temp > 0.99){
+                    else if (temp > 0.99)
+                    {
                         goldScore++;
-                        if(temp > 0.995)
+                        if (temp > 0.995)
                         {
                             if (this.gameObject.transform.position.x < 0)
                             {
@@ -227,13 +276,15 @@ public class moveExcavator : MonoBehaviour
 
                         }
 
-                    } else
-                    {
-                       
                     }
-                } 
-               
-            } else if(collision.gameObject.transform.position.y < -35 && collision.gameObject.transform.position.y > -60)
+                    else
+                    {
+
+                    }
+                }
+
+            }
+            else if (collision.gameObject.transform.position.y < -35 && collision.gameObject.transform.position.y > -60)
             {
                 if (temp > 0.90)
                 {
@@ -267,8 +318,9 @@ public class moveExcavator : MonoBehaviour
                     }
                 }
             }
-            else if(collision.gameObject.transform.position.y < -60 && collision.gameObject.transform.position.y > -75)
+            else if (collision.gameObject.transform.position.y < -60 && collision.gameObject.transform.position.y > -75)
             {
+
                 if (temp > 0.85)
                 {
                     if (temp < 0.93)
@@ -307,6 +359,8 @@ public class moveExcavator : MonoBehaviour
             }
             else
             {
+
+
                 if (temp > 0.75)
                 {
                     if (temp < 0.85)
@@ -331,12 +385,15 @@ public class moveExcavator : MonoBehaviour
 
                     }
                 }
+
             }
             updateTextMainUI();
             Destroy(collision.gameObject);
+
+
         }
 
-        if(collision.gameObject.tag == "GAS")
+        if (collision.gameObject.tag == "GAS")
         {
             gasResource.currentSize = 1;
             gasResource.setSize(1);
@@ -344,21 +401,21 @@ public class moveExcavator : MonoBehaviour
             //depletionRate = depletionRate * 2;
         }
 
-        if (collision.gameObject.tag == "greenCrawler") 
+        if (collision.gameObject.tag == "greenCrawler")
         {
-            
+
             if (health > 15)
             {
                 Debug.Log(health);
                 this.takeDamage(15);
                 Debug.Log((float)health / maxHealth);
-                
+
             }
             else
             {
                 Application.Quit();
             }
-            
+
             Destroy(collision.gameObject);
         }
         if (collision.gameObject.tag == "purpleCrawler")
@@ -366,9 +423,9 @@ public class moveExcavator : MonoBehaviour
 
             if (health > 20)
             {
-                
+
                 this.takeDamage(20);
-                
+
 
             }
             else
@@ -385,7 +442,7 @@ public class moveExcavator : MonoBehaviour
             {
 
                 this.takeDamage(30);
-                
+
 
             }
             else
@@ -395,7 +452,7 @@ public class moveExcavator : MonoBehaviour
 
             Destroy(collision.gameObject);
         }
-        if(collision.gameObject.tag == "LeftBoss")
+        if (collision.gameObject.tag == "LeftBoss")
         {
             if (health > 75)
             {
@@ -427,9 +484,10 @@ public class moveExcavator : MonoBehaviour
     public void leveler(int a)
     {
         //speedLeveler
-        if( a == 0)
+        if (a == 0)
         {
-            switch(speedLvl){
+            switch (speedLvl)
+            {
                 case 1:
                     if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
                     {
@@ -466,14 +524,15 @@ public class moveExcavator : MonoBehaviour
                     }
                     break;
             }
-            
+
             speedlvltxt.text = speedLvl.ToString();
-        } else if ( a == 1) //LR leveler
+        }
+        else if (a == 1) //LR leveler
         {
             switch (LRlvl)
             {
                 case 1:
-                    
+
                     if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
                     {
                         spotLight.spotAngle += 3;
@@ -486,7 +545,7 @@ public class moveExcavator : MonoBehaviour
                     }
                     break;
                 case 2:
-                   
+
                     if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
                     {
                         spotLight.spotAngle += 4;
@@ -560,7 +619,8 @@ public class moveExcavator : MonoBehaviour
                     break;
             }
             hplvltxt.text = healthlvl.ToString();
-        } else if (a == 3)
+        }
+        else if (a == 3)
         {
             switch (weaponlvl)
             {
@@ -573,7 +633,7 @@ public class moveExcavator : MonoBehaviour
                         wpc.bronze += 999;
                         wpc.silver += 999;
                         wpc.gold += 999;
-                        
+
                     }
                     break;
                 case 1:
@@ -588,19 +648,19 @@ public class moveExcavator : MonoBehaviour
                     break;
             }
             weaponlvltxt.text = weaponlvl.ToString();
-            
+
         }
         updateCostText(a);
         updateTextMainUI();
         updateTextUpgrades();
-          
+
     }
 
     public void updateCostText(int a)
     {
         switch (a)
         {
-            case 0 :
+            case 0:
                 bronzeCost.text = spc.bronze.ToString();
                 silverCost.text = spc.silver.ToString();
                 goldCost.text = spc.gold.ToString();
@@ -630,28 +690,55 @@ public class moveExcavator : MonoBehaviour
 
     }
 
+
     public void discountCost(int a)
     {
-        if(a == 0)
+        if (a == 0)
         {
             bronzeScore -= spc.bronze;
             silverScore -= spc.silver;
             goldScore -= spc.gold;
-        } else if ( a == 1)
+        }
+        else if (a == 1)
         {
             bronzeScore -= lrc.bronze;
             silverScore -= lrc.silver;
             goldScore -= lrc.gold;
-        } else if( a == 2)
+        }
+        else if (a == 2)
         {
             bronzeScore -= hpc.bronze;
             silverScore -= hpc.silver;
             goldScore -= hpc.gold;
-        } else if (a == 3)
+        }
+        else if (a == 3)
         {
             bronzeScore -= wpc.bronze;
             silverScore -= wpc.silver;
             goldScore -= wpc.gold;
         }
     }
+
+    IEnumerator Overheat()
+    {
+
+        takeDamage(1);
+        yield return new WaitForSeconds(1f);
+        overheating = false;
+
+    }
+
+    IEnumerator shoot()
+    {
+        shooting = true;
+        GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+
+        go.GetComponent<projectileMove>().getProjectieInfo(
+            new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), 10, 0.1f, this.gameObject);
+        yield return new WaitForSeconds(1f);
+        shooting = false;
+    }
+
+
+
 }

@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class projectileMove : MonoBehaviour
 {
-    private Vector3 target;
-    private Vector3 self;
+    private Vector2 target;
+    private Vector2 self;
     private int damage;
     private GameObject player;
     private GameObject Emitter;
     private float proSpeed;
+    private Rigidbody2D rb;
+    
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("player");
         self = transform.position;
+        rb = this.gameObject.GetComponent<Rigidbody2D>();
         Debug.Log("SELF : " + self);
     }
 
@@ -23,18 +26,17 @@ public class projectileMove : MonoBehaviour
     {
         if (target != null && player.GetComponent<moveExcavator>().paused != true)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, proSpeed);
-            if(transform.position == target)
-            {
-                Destroy(this.gameObject);
-            }
+            Vector2 directionTarget = target - self;
+            rb.AddForce(directionTarget * proSpeed, ForceMode2D.Impulse);
+
+            StartCoroutine("destroy");
         }
     }
-    public void getProjectieInfo(Vector3 t, int dmg, float pS, GameObject sender)
+    public void getProjectieInfo(Vector2 t, int dmg, float pS, GameObject sender)
     {
         target.x = t.x;
         target.y = t.y;
-        target.z = t.z;
+        //target.z = t.z;
 
         damage = dmg;
 
@@ -71,5 +73,14 @@ public class projectileMove : MonoBehaviour
         // Code to execute after the delay
     }
 
-    
+
+    IEnumerator destroy()
+    {
+
+        
+        yield return new WaitForSeconds(5f);
+        Destroy(this.gameObject);
+
+    }
+
 }
