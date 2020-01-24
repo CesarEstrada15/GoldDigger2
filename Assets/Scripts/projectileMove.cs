@@ -17,6 +17,7 @@ public class projectileMove : MonoBehaviour
     {
         player = GameObject.Find("player");
         self = transform.position;
+        
         rb = this.gameObject.GetComponent<Rigidbody2D>();
         Debug.Log("SELF : " + self);
     }
@@ -26,7 +27,15 @@ public class projectileMove : MonoBehaviour
     {
         if (target != null && player.GetComponent<moveExcavator>().paused != true)
         {
-            Vector2 directionTarget = target - self;
+            Vector2 directionTarget;
+            if (Emitter != player)
+            {
+                directionTarget = target - self;
+            }
+            else
+            {
+                directionTarget = target;
+            }
             rb.AddForce(directionTarget * proSpeed, ForceMode2D.Impulse);
 
             StartCoroutine("destroy");

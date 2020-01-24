@@ -8,6 +8,7 @@ public class moveExcavator : MonoBehaviour
 
     //game oBjects
     private Rigidbody2D rb2d;
+    [SerializeField] public Material obbyMat;
     [SerializeField] public Camera cam;
     [SerializeField] public healthbarController healthbar;
     [SerializeField] public healthbarController gasResource;
@@ -24,6 +25,8 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
 
+
+    
     Light spotLight;
     public AudioSource soundSource;
 
@@ -31,11 +34,12 @@ public class moveExcavator : MonoBehaviour
     int speed = 2;
     private int maxHealth = 100;
     private int health = 100;
+    private int damage = 10;
 
     //Resources
-    int bronzeScore = 0;
-    int silverScore = 0;
-    int goldScore = 0;
+    int bronzeScore = 100;
+    int silverScore = 100;
+    int goldScore = 100;
     int gas = 100;
 
     //UI
@@ -123,27 +127,27 @@ public class moveExcavator : MonoBehaviour
 
 
         //Setting initial leveling costs
-        spc.bronze = 8;
-        spc.silver = 5;
-        spc.gold = 3;
+        spc.bronze = 3;
+        spc.silver = 2;
+        spc.gold = 1;
 
-        lrc.bronze = 10;
-        lrc.silver = 7;
-        lrc.gold = 6;
+        lrc.bronze = 3;
+        lrc.silver = 2;
+        lrc.gold = 1;
 
-        hpc.bronze = 13;
-        hpc.silver = 10;
-        hpc.gold = 8;
+        hpc.bronze = 4;
+        hpc.silver = 3;
+        hpc.gold = 2;
 
-        wpc.bronze = 0;
-        wpc.silver = 0;
-        wpc.gold = 0;
+        wpc.bronze = 5;
+        wpc.silver = 3;
+        wpc.gold = 3;
 
         Cursor.visible = false;
         crosshair.SetActive(false);
         overheat.SetActive(false);
         shootJoy.SetActive(false);
-        gunActivated = true;
+        
     }
 
     // Update is called once per frame
@@ -211,7 +215,10 @@ public class moveExcavator : MonoBehaviour
             mainUI.SetActive(panelActive);
             panelActive = !panelActive;
             moveJoy.SetActive(!moveJoy.active);
-
+            if (gunActivated)
+            {
+                shootJoy.SetActive(!shootJoy.active);
+            }
             Cursor.visible = !Cursor.visible;
             paused = !paused;
 
@@ -226,7 +233,7 @@ public class moveExcavator : MonoBehaviour
         {
 
             //crosshair.SetActive(true);
-            shootJoy.SetActive(true);
+            
             //mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
             //crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
 
@@ -466,6 +473,13 @@ public class moveExcavator : MonoBehaviour
                 Application.Quit();
             }
         }
+
+        if (collision.gameObject.tag == "ObbyShield")
+        {
+            obsidianShield = true;
+            this.gameObject.GetComponent<MeshRenderer>().material = obbyMat;
+            Destroy(collision.gameObject);
+        }
     }
 
     private void updateTextMainUI()
@@ -494,9 +508,9 @@ public class moveExcavator : MonoBehaviour
                         speed += 1;
                         speedLvl++;
                         discountCost(a);
-                        spc.bronze += 4;
-                        spc.silver += 3;
-                        spc.gold += 2;
+                        spc.bronze += 3;
+                        spc.silver += 2;
+                        spc.gold += 1;
 
                     }
                     break;
@@ -508,7 +522,7 @@ public class moveExcavator : MonoBehaviour
                         discountCost(a);
                         spc.bronze += 5;
                         spc.silver += 3;
-                        spc.gold += 2;
+                        spc.gold += 3;
                     }
                     break;
                 case 3:
@@ -538,9 +552,9 @@ public class moveExcavator : MonoBehaviour
                         spotLight.spotAngle += 3;
                         LRlvl++;
                         discountCost(a);
-                        lrc.bronze += 4;
-                        lrc.silver += 3;
-                        lrc.gold += 2;
+                        lrc.bronze += 3;
+                        lrc.silver += 2;
+                        lrc.gold += 1;
 
                     }
                     break;
@@ -551,9 +565,9 @@ public class moveExcavator : MonoBehaviour
                         spotLight.spotAngle += 4;
                         LRlvl++;
                         discountCost(a);
-                        lrc.bronze += 4;
+                        lrc.bronze += 5;
                         lrc.silver += 3;
-                        lrc.gold += 2;
+                        lrc.gold += 3;
 
                     }
                     break;
@@ -598,9 +612,9 @@ public class moveExcavator : MonoBehaviour
                         healthbar.setSize(1f);
                         healthlvl++;
                         discountCost(a);
-                        hpc.bronze += 4;
-                        hpc.silver += 3;
-                        hpc.gold += 2;
+                        hpc.bronze += 5;
+                        hpc.silver += 4;
+                        hpc.gold += 3;
                     }
                     break;
                 case 3:
@@ -628,23 +642,39 @@ public class moveExcavator : MonoBehaviour
                     if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
                     {
                         gunActivated = true;
+                        
+
                         weaponlvl++;
                         discountCost(a);
-                        wpc.bronze += 999;
-                        wpc.silver += 999;
-                        wpc.gold += 999;
+                        wpc.bronze += 4;
+                        wpc.silver += 3;
+                        wpc.gold += 2;
 
                     }
                     break;
                 case 1:
-                    health = 150;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        damage += 10;
+                        weaponlvl++;
+                        discountCost(a);
+                        wpc.bronze += 4;
+                        wpc.silver += 3;
+                        wpc.gold += 2;
+
+                    }
                     break;
                 case 2:
-                    health = 200;
-                    healthbar.setSize(1f);
-                    healthlvl++;
+                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    {
+                        damage += 10;
+                        weaponlvl++;
+                        discountCost(a);
+                        wpc.bronze += 0;
+                        wpc.silver += 0;
+                        wpc.gold += 0;
+
+                    }
                     break;
             }
             weaponlvltxt.text = weaponlvl.ToString();
@@ -734,7 +764,7 @@ public class moveExcavator : MonoBehaviour
         GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
 
         go.GetComponent<projectileMove>().getProjectieInfo(
-            new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), 10, 0.1f, this.gameObject);
+            new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), damage, 0.1f, this.gameObject);
         yield return new WaitForSeconds(1f);
         shooting = false;
     }

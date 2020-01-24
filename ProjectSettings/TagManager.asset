@@ -11,6 +11,7 @@ TagManager:
   - orangeCrawler
   - Undefined
   - LeftBoss
+  - ObbyShield
   layers:
   - Default
   - TransparentFX

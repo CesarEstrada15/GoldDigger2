@@ -6,6 +6,7 @@ public class crawlerMovement : MonoBehaviour
 {
     private GameObject target;
     public GameObject projectile;
+    public GameObject obsidianshield;
     
     private int health;
     private float speed;
@@ -91,5 +92,19 @@ public class crawlerMovement : MonoBehaviour
     public float getHealth()
     {
         return health;
+    }
+
+    private void OnDestroy()
+    {
+        if(this.gameObject.tag == "LeftBoss")
+        {
+            if (this.getHealth() > 0)
+            {
+            }
+            else
+            {
+                GameObject shieldDrop = Instantiate(obsidianshield, transform.position, Quaternion.identity) as GameObject;
+            }
+        }
     }
 }
