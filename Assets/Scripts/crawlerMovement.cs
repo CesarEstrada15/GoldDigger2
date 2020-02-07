@@ -7,7 +7,10 @@ public class crawlerMovement : MonoBehaviour
     private GameObject target;
     public GameObject projectile;
     public GameObject obsidianshield;
-    
+    public GameObject greenGoo;
+    public GameObject purpleGoo;
+    public GameObject orangeGoo;
+
     private int health;
     private float speed;
     float SavedTime = 0;
@@ -105,6 +108,18 @@ public class crawlerMovement : MonoBehaviour
             {
                 GameObject shieldDrop = Instantiate(obsidianshield, transform.position, Quaternion.identity) as GameObject;
             }
+        }
+        if(this.gameObject.tag == "greenCrawler")
+        {
+            Instantiate(greenGoo, transform.position, Quaternion.identity);
+        }
+        if (this.gameObject.tag == "purpleCrawler")
+        {
+            Instantiate(purpleGoo, transform.position, Quaternion.identity);
+        }
+        if (this.gameObject.tag == "orangeCrawler")
+        {
+            Instantiate(orangeGoo, transform.position, Quaternion.identity);
         }
     }
 }

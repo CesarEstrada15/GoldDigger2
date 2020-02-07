@@ -12,6 +12,11 @@ TagManager:
   - Undefined
   - LeftBoss
   - ObbyShield
+  - ArenaGreen
+  - greenArena
+  - greenGoo
+  - orangeGoo
+  - purpleGoo
   layers:
   - Default
   - TransparentFX

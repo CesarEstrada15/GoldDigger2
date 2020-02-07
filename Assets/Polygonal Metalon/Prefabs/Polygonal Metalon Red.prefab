@@ -173,6 +173,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 102fc723f83735f4b927426bf24d67e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectile: {fileID: 0}
+  obsidianshield: {fileID: 0}
+  greenGoo: {fileID: 0}
+  purpleGoo: {fileID: 0}
+  orangeGoo: {fileID: 4842583484669790175, guid: 5300317ec2bf6f545998d7129093b31b,
+    type: 3}
 --- !u!70 &7629390072195784254
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

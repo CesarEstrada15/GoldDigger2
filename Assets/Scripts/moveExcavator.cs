@@ -41,6 +41,9 @@ public class moveExcavator : MonoBehaviour
     int silverScore = 100;
     int goldScore = 100;
     int gas = 100;
+    int greenGoo = 0;
+    int purpleGoo = 0;
+    int orangeGoo = 0;
 
     //UI
     GameObject panel;
@@ -53,6 +56,12 @@ public class moveExcavator : MonoBehaviour
     Text bronzeU;
     Text silverU;
     Text goldU;
+    Text greenG;
+    Text purpleG;
+    Text orangeG;
+    Text greenGU;
+    Text purpleGU;
+    Text orangeGU;
     Text speedlvltxt;
     Text LRlvltxt;
     Text hplvltxt;
@@ -60,6 +69,9 @@ public class moveExcavator : MonoBehaviour
     Text bronzeCost;
     Text silverCost;
     Text goldCost;
+    Text greenCost;
+    Text purpleCost;
+    Text orangeCost;
 
     bool panelActive = false;
 
@@ -69,6 +81,7 @@ public class moveExcavator : MonoBehaviour
     private bool obsidianShield = false;
     private bool excavate = true;
     private bool overheating = false;
+    public bool inFight = false;
 
 
     //GUN VARIABLES
@@ -115,6 +128,12 @@ public class moveExcavator : MonoBehaviour
         bronzeU = GameObject.Find("Bronze2").GetComponent<Text>();
         silverU = GameObject.Find("Silver2").GetComponent<Text>();
         goldU = GameObject.Find("Gold2").GetComponent<Text>();
+        greenG = GameObject.Find("Green").GetComponent<Text>();
+        greenGU = GameObject.Find("Green2").GetComponent<Text>();
+        purpleG = GameObject.Find("Purple").GetComponent<Text>();
+        purpleGU = GameObject.Find("Purple2").GetComponent<Text>();
+        orangeG = GameObject.Find("Orange").GetComponent<Text>();
+        orangeGU = GameObject.Find("Orange2").GetComponent<Text>();
         speedlvltxt = GameObject.Find("SpeedLVL").GetComponent<Text>();
         LRlvltxt = GameObject.Find("LightRangeLVL").GetComponent<Text>();
         hplvltxt = GameObject.Find("HealthLVL").GetComponent<Text>();
@@ -122,6 +141,9 @@ public class moveExcavator : MonoBehaviour
         bronzeCost = GameObject.Find("BronzeCostNum").GetComponent<Text>();
         silverCost = GameObject.Find("SilverCostNum").GetComponent<Text>();
         goldCost = GameObject.Find("GoldCostNum").GetComponent<Text>();
+        greenCost = GameObject.Find("GreenCost").GetComponent<Text>();
+        purpleCost = GameObject.Find("PurpleCost").GetComponent<Text>();
+        orangeCost = GameObject.Find("OrangeCost").GetComponent<Text>();
         panel.SetActive(panelActive);
 
 
@@ -153,7 +175,7 @@ public class moveExcavator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
         if (!paused)
         {
             //Arrow movement
@@ -459,6 +481,25 @@ public class moveExcavator : MonoBehaviour
 
             Destroy(collision.gameObject);
         }
+
+        if(collision.gameObject.tag == "greenGoo")
+        {
+            greenGoo++;
+            Destroy(collision.gameObject);
+            updateGooText();
+        }
+        if (collision.gameObject.tag == "purpleGoo")
+        {
+            purpleGoo++;
+            Destroy(collision.gameObject);
+            updateGooText();
+        }
+        if (collision.gameObject.tag == "orangeGoo")
+        {
+            orangeGoo++;
+            Destroy(collision.gameObject);
+            updateGooText();
+        }
         if (collision.gameObject.tag == "LeftBoss")
         {
             if (health > 75)
@@ -480,21 +521,48 @@ public class moveExcavator : MonoBehaviour
             this.gameObject.GetComponent<MeshRenderer>().material = obbyMat;
             Destroy(collision.gameObject);
         }
+        if( collision.gameObject.tag == "greenArena")
+        {
+            Debug.Log("Entered");
+            cam.GetComponent<cameraController>().setArena(1);
+            
+            
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "ArenaGreen")
+        {
+
+            cam.GetComponent<cameraController>().setArena(1);
+        }
     }
 
     private void updateTextMainUI()
+
     {
         bronzeTxt.text = bronzeScore.ToString();
         silverTxt.text = silverScore.ToString();
         goldTxt.text = goldScore.ToString();
+        
     }
     private void updateTextUpgrades()
     {
         bronzeU.text = bronzeTxt.text;
         silverU.text = silverTxt.text;
         goldU.text = goldTxt.text;
+        greenGU.text = greenG.text;
+        purpleGU.text = purpleG.text;
+        orangeGU.text = orangeG.text;
     }
 
+    private void updateGooText()
+    {
+        greenG.text = greenGoo.ToString();
+        purpleG.text = purpleGoo.ToString();
+        orangeG.text = orangeGoo.ToString();
+    }
+    
     public void leveler(int a)
     {
         //speedLeveler
@@ -746,6 +814,27 @@ public class moveExcavator : MonoBehaviour
             bronzeScore -= wpc.bronze;
             silverScore -= wpc.silver;
             goldScore -= wpc.gold;
+        }
+    }
+
+    public void openMenu()
+    {
+        soundSource.mute = !soundSource.mute;
+
+        panel.SetActive(!panelActive);
+        mainUI.SetActive(panelActive);
+        panelActive = !panelActive;
+        moveJoy.SetActive(!moveJoy.active);
+        if (gunActivated)
+        {
+            shootJoy.SetActive(!shootJoy.active);
+        }
+        Cursor.visible = !Cursor.visible;
+        paused = !paused;
+
+        if (paused)
+        {
+            updateTextUpgrades();
         }
     }
 

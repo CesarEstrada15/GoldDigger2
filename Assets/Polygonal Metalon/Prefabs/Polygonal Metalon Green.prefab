@@ -1184,6 +1184,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 102fc723f83735f4b927426bf24d67e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectile: {fileID: 0}
+  obsidianshield: {fileID: 0}
+  greenGoo: {fileID: 8546264302969706114, guid: 16f5fbb04cb3d954a9118ad88e85f61b,
+    type: 3}
+  purpleGoo: {fileID: 0}
+  orangeGoo: {fileID: 0}
 --- !u!61 &7606094279081411412
 BoxCollider2D:
   m_ObjectHideFlags: 0
