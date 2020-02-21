@@ -17,6 +17,7 @@ TagManager:
   - greenGoo
   - orangeGoo
   - purpleGoo
+  - greenBounce
   layers:
   - Default
   - TransparentFX

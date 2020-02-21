@@ -82,6 +82,8 @@ public class moveExcavator : MonoBehaviour
     private bool excavate = true;
     private bool overheating = false;
     public bool inFight = false;
+    private bool inGreenRange = false;
+    private float normalZoom = 5;
 
 
     //GUN VARIABLES
@@ -524,17 +526,27 @@ public class moveExcavator : MonoBehaviour
         if( collision.gameObject.tag == "greenArena")
         {
             Debug.Log("Entered");
-            cam.GetComponent<cameraController>().setArena(1);
+            arenaZoom();
             
             
         }
+
+        if( collision.gameObject.tag == "greenBounce")
+        {
+            inGreenRange = true;
+        }
+
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ArenaGreen")
+        if (collision.gameObject.tag == "greenArena")
         {
 
-            cam.GetComponent<cameraController>().setArena(1);
+            cam.orthographicSize = normalZoom;
+        }
+        if (collision.gameObject.tag == "greenBounce")
+        {
+            inGreenRange = false ;
         }
     }
 
@@ -838,6 +850,15 @@ public class moveExcavator : MonoBehaviour
         }
     }
 
+    private void arenaZoom()
+    {
+        cam.orthographicSize = 20;
+    }
+
+    public bool getGreenRange()
+    {
+        return inGreenRange;
+    }
     IEnumerator Overheat()
     {
 
@@ -859,5 +880,5 @@ public class moveExcavator : MonoBehaviour
     }
 
 
-
+    
 }

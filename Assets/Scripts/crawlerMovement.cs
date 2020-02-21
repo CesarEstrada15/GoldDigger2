@@ -10,15 +10,25 @@ public class crawlerMovement : MonoBehaviour
     public GameObject greenGoo;
     public GameObject purpleGoo;
     public GameObject orangeGoo;
+    public GameObject area;
+
+    private AudioClip moveAttack;
 
     private int health;
     private float speed;
     float SavedTime = 0;
     float DelayTime = 1.3f;
+
+    //For green Boss movement
+
+    private float speedAttack = 0.01f;
+    
+    private bool resting = false;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        //  moveAttack = Resources.Load<AudioClip>("Resources/")
         target = GameObject.Find("player");
         if(this.gameObject.tag == "greenCrawler")
         {
@@ -42,18 +52,26 @@ public class crawlerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (target != null && target.GetComponent<moveExcavator>().paused != true) 
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed);
            // transform.LookAt(target.transform.position);
             if(this.gameObject.tag == "LeftBoss")
             {
+                
                 float distanceToPlayer = (transform.position - target.transform.position).magnitude;
                 if(distanceToPlayer <= 15)
                 {
                     
                     OnTriggerStay();
+                    if (target.GetComponent<moveExcavator>().getGreenRange() && resting == false)
+                    {
+                        //transform.position = Vector2.MoveTowards(transform.position, target.transform.position, 0.01f);
+                        StartCoroutine("moveAttack");
+                    }
                 }
+                
             }
         }
         if(health <= 0)
@@ -62,18 +80,49 @@ public class crawlerMovement : MonoBehaviour
         }
         
     }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag == "greenBounce")
+        {
+          
+        }
+    }
 
     public void takeDamage(int dmg)
     {
         health -= dmg;
     }
 
-    IEnumerator ExecuteAfterTime(float time)
+    IEnumerator moveAttack()
     {
-        yield return new WaitForSeconds(time);
+        Vector2 tar = target.transform.position;
+        Vector2 current = transform.position;
+        resting = true;
+        //while (transform.position.x != tar.x && transform.position.y != tar.y)
+        //{
+        StartCoroutine(MoveTo(transform, tar, 5));
+       // }
+        yield return new WaitForSeconds(5);
 
-        // Code to execute after the delay
+        resting = false;
+
+       
         
+    }
+
+    IEnumerator MoveTo(Transform mover, Vector2 destination, float speed)
+    {
+        // This looks unsafe, but Unity uses
+        // en epsilon when comparing vectors.
+        while ((Vector2)mover.position != destination)
+        {
+            mover.position = Vector2.MoveTowards(
+                mover.position,
+                destination,
+                speed * Time.deltaTime);
+            // Wait a frame and move again.
+            yield return null;
+        }
     }
 
     void OnTriggerStay()

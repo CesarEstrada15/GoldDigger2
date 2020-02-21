@@ -27,8 +27,7 @@ public class cameraController : MonoBehaviour
         {
             if(ArenaGreen == true)
             {
-                offset = new Vector3(0.0f, -0.5f, -30f);
-                transform.position = player.transform.position + offset;
+                
             }
         }
     }
