@@ -11,8 +11,9 @@ public class crawlerMovement : MonoBehaviour
     public GameObject purpleGoo;
     public GameObject orangeGoo;
     public GameObject area;
-
-    private AudioClip moveAttack;
+    private bool paused;
+    public AudioClip moveAttackSound;
+    public AudioClip shootSound;
 
     private int health;
     private float speed;
@@ -24,13 +25,17 @@ public class crawlerMovement : MonoBehaviour
     private float speedAttack = 0.01f;
     
     private bool resting = false;
+    public bool greenRange = false;
+    public bool greenArena = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        //  moveAttack = Resources.Load<AudioClip>("Resources/")
+        //moveAttackSound = Resources.Load<AudioClip>("Resources/BossScreech");
+        
         target = GameObject.Find("player");
-        if(this.gameObject.tag == "greenCrawler")
+        
+        if (this.gameObject.tag == "greenCrawler")
         {
             health = 50;
             speed = 0.015f;
@@ -52,7 +57,8 @@ public class crawlerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log(greenRange);
+        Debug.Log(greenArena);
         if (target != null && target.GetComponent<moveExcavator>().paused != true) 
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed);
@@ -61,14 +67,14 @@ public class crawlerMovement : MonoBehaviour
             {
                 
                 float distanceToPlayer = (transform.position - target.transform.position).magnitude;
-                if(distanceToPlayer <= 15)
+                if(distanceToPlayer <= 15 && greenArena == true)
                 {
                     
                     OnTriggerStay();
-                    if (target.GetComponent<moveExcavator>().getGreenRange() && resting == false)
+                    if (greenRange == true && resting == false)
                     {
                         //transform.position = Vector2.MoveTowards(transform.position, target.transform.position, 0.01f);
-                        StartCoroutine("moveAttack");
+                        StartCoroutine("moveAttackEnum");
                     }
                 }
                 
@@ -93,14 +99,19 @@ public class crawlerMovement : MonoBehaviour
         health -= dmg;
     }
 
-    IEnumerator moveAttack()
+    IEnumerator moveAttackEnum()
     {
+        
         Vector2 tar = target.transform.position;
         Vector2 current = transform.position;
         resting = true;
         //while (transform.position.x != tar.x && transform.position.y != tar.y)
         //{
-        StartCoroutine(MoveTo(transform, tar, 5));
+        if (target.GetComponent<moveExcavator>().paused != true)
+        {
+            AudioSource.PlayClipAtPoint(moveAttackSound, target.transform.position);
+            StartCoroutine(MoveTo(transform, tar, 5));
+        }
        // }
         yield return new WaitForSeconds(5);
 
@@ -134,9 +145,9 @@ public class crawlerMovement : MonoBehaviour
 
             //Anything in here will be called every two seconds        
             GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
-
+            AudioSource.PlayClipAtPoint(shootSound, transform.position);
             go.GetComponent<projectileMove>().getProjectieInfo(target.transform.position, 50, 0.07f, this.gameObject);
-            print(DelayTime + " seconds have passed");
+           
         }
 
     }
@@ -146,6 +157,15 @@ public class crawlerMovement : MonoBehaviour
         return health;
     }
 
+    public void setGreenArena(bool a)
+    {
+        greenArena = a;
+    }
+
+    public void setGreenRange(bool a)
+    {
+        greenRange = a;
+    }
     private void OnDestroy()
     {
         if(this.gameObject.tag == "LeftBoss")

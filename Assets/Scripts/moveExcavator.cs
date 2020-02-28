@@ -24,11 +24,18 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
+    public GameObject leftBoss;
 
 
     
     Light spotLight;
+    //Sound
     public AudioSource soundSource;
+    public AudioClip BGSound;
+    public AudioClip ArenaSound;
+    public AudioClip oreCollected;
+    public AudioClip crashSound;
+    public AudioClip shootSound;
 
     //Excavator capabilities
     int speed = 2;
@@ -122,7 +129,8 @@ public class moveExcavator : MonoBehaviour
         soundSource = GameObject.Find("Sound").GetComponent<AudioSource>();
         spotLight = GameObject.Find("Spot Light").GetComponent<Light>();
         spotLight.type = LightType.Spot;
-        Debug.Log(spotLight.spotAngle);
+        leftBoss = GameObject.Find("LeftBoss");
+        
 
         bronzeTxt = GameObject.Find("Bronze").GetComponent<Text>();
         silverTxt = GameObject.Find("Silver").GetComponent<Text>();
@@ -283,16 +291,20 @@ public class moveExcavator : MonoBehaviour
 
                 if (temp > 0.95)
                 {
+
                     if (temp < 0.975)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         bronzeScore++;
                     }
                     else if (temp > 0.975 && temp < 0.99)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         silverScore++;
                     }
                     else if (temp > 0.99)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         goldScore++;
                         if (temp > 0.995)
                         {
@@ -321,14 +333,17 @@ public class moveExcavator : MonoBehaviour
                 {
                     if (temp < 0.95)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         bronzeScore++;
                     }
                     else if (temp > 0.95 && temp < 0.98)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         silverScore++;
                     }
                     else if (temp > 0.98)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         goldScore++;
                         if (temp > 0.985)
                         {
@@ -356,14 +371,17 @@ public class moveExcavator : MonoBehaviour
                 {
                     if (temp < 0.93)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         bronzeScore++;
                     }
                     else if (temp > 0.93 && temp < 0.97)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         silverScore++;
                     }
                     else if (temp > 0.97)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         goldScore++;
                         if (temp > 0.975)
                         {
@@ -396,14 +414,17 @@ public class moveExcavator : MonoBehaviour
                 {
                     if (temp < 0.85)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         bronzeScore++;
                     }
                     else if (temp > 0.85 && temp < 0.95)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         silverScore++;
                     }
                     else if (temp > 0.95)
                     {
+                        AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                         goldScore++;
                         if (temp > 0.965)
                         {
@@ -525,8 +546,10 @@ public class moveExcavator : MonoBehaviour
         }
         if( collision.gameObject.tag == "greenArena")
         {
-            Debug.Log("Entered");
+            soundSource.clip = ArenaSound;
+            soundSource.PlayDelayed(2);
             arenaZoom();
+            leftBoss.GetComponent<crawlerMovement>().setGreenArena(true);
             
             
         }
@@ -534,6 +557,7 @@ public class moveExcavator : MonoBehaviour
         if( collision.gameObject.tag == "greenBounce")
         {
             inGreenRange = true;
+            leftBoss.GetComponent<crawlerMovement>().setGreenRange(true);
         }
 
     }
@@ -541,12 +565,15 @@ public class moveExcavator : MonoBehaviour
     {
         if (collision.gameObject.tag == "greenArena")
         {
-
+            soundSource.clip = BGSound;
+            soundSource.PlayDelayed(2);
             cam.orthographicSize = normalZoom;
+            leftBoss.GetComponent<crawlerMovement>().setGreenArena(false);
         }
         if (collision.gameObject.tag == "greenBounce")
         {
             inGreenRange = false ;
+            leftBoss.GetComponent<crawlerMovement>().setGreenRange(false);
         }
     }
 
@@ -797,7 +824,7 @@ public class moveExcavator : MonoBehaviour
     {
         health -= dmg;
         healthbar.setSize((float)health / maxHealth);
-
+        AudioSource.PlayClipAtPoint(crashSound, transform.position);
     }
 
 
@@ -852,7 +879,7 @@ public class moveExcavator : MonoBehaviour
 
     private void arenaZoom()
     {
-        cam.orthographicSize = 20;
+        cam.orthographicSize = 15;
     }
 
     public bool getGreenRange()
@@ -872,7 +899,7 @@ public class moveExcavator : MonoBehaviour
     {
         shooting = true;
         GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
-
+        AudioSource.PlayClipAtPoint(shootSound, transform.position);
         go.GetComponent<projectileMove>().getProjectieInfo(
             new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), damage, 0.1f, this.gameObject);
         yield return new WaitForSeconds(1f);
