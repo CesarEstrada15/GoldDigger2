@@ -11,6 +11,7 @@ public class crawlerMovement : MonoBehaviour
     public GameObject purpleGoo;
     public GameObject orangeGoo;
     public GameObject area;
+    public moveExcavator playerScript;
     private bool paused;
     public AudioClip moveAttackSound;
     public AudioClip shootSound;
@@ -34,7 +35,7 @@ public class crawlerMovement : MonoBehaviour
         //moveAttackSound = Resources.Load<AudioClip>("Resources/BossScreech");
         
         target = GameObject.Find("player");
-        
+        playerScript = target.GetComponent<moveExcavator>();
         if (this.gameObject.tag == "greenCrawler")
         {
             health = 50;
@@ -57,8 +58,8 @@ public class crawlerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(greenRange);
-        Debug.Log(greenArena);
+       // Debug.Log(greenArena);
+        //Debug.Log(greenRange);
         if (target != null && target.GetComponent<moveExcavator>().paused != true) 
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed);
@@ -97,6 +98,8 @@ public class crawlerMovement : MonoBehaviour
     public void takeDamage(int dmg)
     {
         health -= dmg;
+        playerScript.addDamageCount();
+        
     }
 
     IEnumerator moveAttackEnum()
@@ -159,11 +162,13 @@ public class crawlerMovement : MonoBehaviour
 
     public void setGreenArena(bool a)
     {
+        Debug.Log("calledsetArena");
         greenArena = a;
     }
 
     public void setGreenRange(bool a)
     {
+        Debug.Log("calledsetrange");
         greenRange = a;
     }
     private void OnDestroy()

@@ -15,6 +15,7 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject projectile;
     [SerializeField] public AudioClip all;
     [SerializeField] public AudioClip boss;
+    [SerializeField] public AudioClip endSound;
     [SerializeField] public GameObject overheat;
     [SerializeField] public Joystick joystick;
     [SerializeField] public Joystick joystickshoot;
@@ -24,7 +25,12 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
+    [SerializeField] public GameObject highscoreTable;
+    [SerializeField] public GameObject highscoreTableReal;
+    [SerializeField] public GameObject enterName;
+    
     public GameObject leftBoss;
+
 
 
     
@@ -51,6 +57,9 @@ public class moveExcavator : MonoBehaviour
     int greenGoo = 0;
     int purpleGoo = 0;
     int orangeGoo = 0;
+
+    //animations
+    [SerializeField] private Animator myAnim;
 
     //UI
     GameObject panel;
@@ -91,6 +100,8 @@ public class moveExcavator : MonoBehaviour
     public bool inFight = false;
     private bool inGreenRange = false;
     private float normalZoom = 5;
+    private int disablehst = 0;
+    private bool end = false;
 
 
     //GUN VARIABLES
@@ -99,6 +110,12 @@ public class moveExcavator : MonoBehaviour
     private bool shooting = false;
     private Vector2 mousePos;
 
+    //Highscore variables
+    private int blocksDigged = 0;
+    private int damageDealt = 0;
+    private string nameField = "";
+    public InputField inputField;
+    
     //Leveling
     private int speedLvl = 1;
     private int LRlvl = 1;
@@ -156,6 +173,7 @@ public class moveExcavator : MonoBehaviour
         orangeCost = GameObject.Find("OrangeCost").GetComponent<Text>();
         panel.SetActive(panelActive);
 
+        
 
 
         //Setting initial leveling costs
@@ -186,6 +204,21 @@ public class moveExcavator : MonoBehaviour
     void Update()
     {
         
+        if(disablehst != 1){
+            highscoreTable.SetActive(false);
+            enterName.SetActive(false);
+            panel.SetActive(panelActive);
+            disablehst = 1;
+        }
+        if (end)
+        {
+
+            AudioSource.PlayClipAtPoint(endSound, transform.position);
+            paused = true;
+            enterName.SetActive(true);
+            inputField = GameObject.Find("InputField").GetComponent<InputField>();
+        }
+
         if (!paused)
         {
             //Arrow movement
@@ -218,7 +251,11 @@ public class moveExcavator : MonoBehaviour
             else
             {
                 //End Game cause you ran out of fuel
-                Application.Quit();
+                //Application.Quit();
+                
+                end = true;
+               
+                
             }
 
 
@@ -239,26 +276,28 @@ public class moveExcavator : MonoBehaviour
             excavate = true;
             overheat.SetActive(false);
         }
-        if (Input.GetKeyDown("backspace"))
-        {
-            soundSource.mute = !soundSource.mute;
+        
+        if (Input.GetKeyDown("backspace") && end == false)
+         {
+                soundSource.mute = !soundSource.mute;
 
-            panel.SetActive(!panelActive);
-            mainUI.SetActive(panelActive);
-            panelActive = !panelActive;
-            moveJoy.SetActive(!moveJoy.active);
-            if (gunActivated)
-            {
-                shootJoy.SetActive(!shootJoy.active);
-            }
-            Cursor.visible = !Cursor.visible;
-            paused = !paused;
+                panel.SetActive(!panelActive);
+                mainUI.SetActive(panelActive);
+                panelActive = !panelActive;
+                moveJoy.SetActive(!moveJoy.active);
+                if (gunActivated)
+                {
+                    shootJoy.SetActive(!shootJoy.active);
+                }
+                Cursor.visible = !Cursor.visible;
+                paused = !paused;
 
-            if (paused)
-            {
-                updateTextUpgrades();
-            }
-        }
+                if (paused)
+                {
+                    updateTextUpgrades();
+                }
+         }
+        
 
         //If guns are active move crosshair to mouse at all times
         if (gunActivated == true)
@@ -283,7 +322,7 @@ public class moveExcavator : MonoBehaviour
     {
         if (collision.gameObject.tag == "Target" && excavate)
         {
-
+            blocksDigged++;
             float temp = Random.value;
 
             if (collision.gameObject.transform.position.y > -35)
@@ -549,15 +588,16 @@ public class moveExcavator : MonoBehaviour
             soundSource.clip = ArenaSound;
             soundSource.PlayDelayed(2);
             arenaZoom();
-            leftBoss.GetComponent<crawlerMovement>().setGreenArena(true);
-            
+           // leftBoss.GetComponent<crawlerMovement>().setGreenArena(true);
+            leftBoss.GetComponentInChildren<crawlerMovement>().setGreenArena(true);
             
         }
 
         if( collision.gameObject.tag == "greenBounce")
         {
             inGreenRange = true;
-            leftBoss.GetComponent<crawlerMovement>().setGreenRange(true);
+            //leftBoss.GetComponent<crawlerMovement>().setGreenRange(true);
+            leftBoss.GetComponentInChildren<crawlerMovement>().setGreenRange(true);
         }
 
     }
@@ -568,12 +608,14 @@ public class moveExcavator : MonoBehaviour
             soundSource.clip = BGSound;
             soundSource.PlayDelayed(2);
             cam.orthographicSize = normalZoom;
-            leftBoss.GetComponent<crawlerMovement>().setGreenArena(false);
+           // leftBoss.GetComponent<crawlerMovement>().setGreenArena(false);
+            leftBoss.GetComponentInChildren<crawlerMovement>().setGreenArena(false);
         }
         if (collision.gameObject.tag == "greenBounce")
         {
             inGreenRange = false ;
-            leftBoss.GetComponent<crawlerMovement>().setGreenRange(false);
+           // leftBoss.GetComponent<crawlerMovement>().setGreenRange(false);
+            leftBoss.GetComponentInChildren<crawlerMovement>().setGreenRange(false);
         }
     }
 
@@ -822,9 +864,14 @@ public class moveExcavator : MonoBehaviour
 
     public void takeDamage(int dmg)
     {
+        myAnim.SetTrigger("tookDMG");
         health -= dmg;
         healthbar.setSize((float)health / maxHealth);
         AudioSource.PlayClipAtPoint(crashSound, transform.position);
+        if(health <= 0)
+        {
+            end = true;
+        }
     }
 
 
@@ -885,6 +932,23 @@ public class moveExcavator : MonoBehaviour
     public bool getGreenRange()
     {
         return inGreenRange;
+    }
+    public void addDamageCount()
+    {
+        damageDealt += damage;
+    }
+    public void setName()
+    {
+        nameField = inputField.text;
+    }
+    public void onEndEditName()
+    {
+        enterName.SetActive(false);
+        highscoreTable.SetActive(true);
+        highscoreTableReal.GetComponent<highScoreTable>().addHSE(blocksDigged, damageDealt, Time.deltaTime, nameField);
+        
+        
+        
     }
     IEnumerator Overheat()
     {
