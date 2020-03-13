@@ -102,6 +102,7 @@ public class moveExcavator : MonoBehaviour
     private float normalZoom = 5;
     private int disablehst = 0;
     private bool end = false;
+    private bool endAndHS = false;
 
 
     //GUN VARIABLES
@@ -210,14 +211,16 @@ public class moveExcavator : MonoBehaviour
             panel.SetActive(panelActive);
             disablehst = 1;
         }
-        if (end)
+        if (end && !endAndHS )
         {
 
             AudioSource.PlayClipAtPoint(endSound, transform.position);
             paused = true;
-            enterName.SetActive(true);
+
+            enterName.SetActive(!endAndHS);
             inputField = GameObject.Find("InputField").GetComponent<InputField>();
         }
+        
 
         if (!paused)
         {
@@ -943,6 +946,7 @@ public class moveExcavator : MonoBehaviour
     }
     public void onEndEditName()
     {
+        endAndHS = true;
         enterName.SetActive(false);
         highscoreTable.SetActive(true);
         highscoreTableReal.GetComponent<highScoreTable>().addHSE(blocksDigged, damageDealt, Time.deltaTime, nameField);
