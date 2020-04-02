@@ -749,7 +749,7 @@ GameObject:
   - component: {fileID: 4673369876368086}
   - component: {fileID: 95980759410839360}
   - component: {fileID: 1399455388266499914}
-  - component: {fileID: 1701899747664099934}
+  - component: {fileID: 5682911636077286202}
   m_Layer: 0
   m_Name: Polygonal Metalon Purple
   m_TagString: purpleCrawler
@@ -826,7 +826,13 @@ MonoBehaviour:
   purpleGoo: {fileID: 3440131712211565605, guid: 46d226e9adf861040943a85e38c394b9,
     type: 3}
   orangeGoo: {fileID: 0}
---- !u!70 &1701899747664099934
+  area: {fileID: 0}
+  playerScript: {fileID: 0}
+  moveAttackSound: {fileID: 0}
+  shootSound: {fileID: 0}
+  greenRange: 0
+  greenArena: 0
+--- !u!70 &5682911636077286202
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -839,8 +845,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.5}
-  m_Size: {x: 3.1089396, y: 3.6384244}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.5, y: 1}
   m_Direction: 0
 --- !u!1 &1486048802852170
 GameObject:

@@ -950,9 +950,9 @@ public class moveExcavator : MonoBehaviour
         enterName.SetActive(false);
         highscoreTable.SetActive(true);
         highscoreTableReal.GetComponent<highScoreTable>().addHSE(blocksDigged, damageDealt, Time.deltaTime, nameField);
-        
-        
-        
+        //highscoreTableReal.GetComponent<highScoreTable>().addHSE(blocksDigged, damageDealt, Time.deltaTime, nameField);
+
+
     }
     IEnumerator Overheat()
     {
