@@ -10,6 +10,7 @@ public class healthbarController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+
         bar = transform.Find("Bar");
         currentSize = 1f;
        

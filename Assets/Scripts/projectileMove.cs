@@ -19,7 +19,7 @@ public class projectileMove : MonoBehaviour
         self = transform.position;
         
         rb = this.gameObject.GetComponent<Rigidbody2D>();
-        Debug.Log("SELF : " + self);
+        
     }
 
     // Update is called once per frame

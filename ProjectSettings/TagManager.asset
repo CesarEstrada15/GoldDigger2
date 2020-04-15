@@ -19,6 +19,12 @@ TagManager:
   - purpleGoo
   - greenBounce
   - rightBoss
+  - purpleEgg
+  - greenEgg
+  - orangeEgg
+  - finalBoss
+  - orangeArena
+  - orangeRange
   layers:
   - Default
   - TransparentFX

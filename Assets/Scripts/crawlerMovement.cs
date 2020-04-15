@@ -15,11 +15,21 @@ public class crawlerMovement : MonoBehaviour
     private bool paused;
     public AudioClip moveAttackSound;
     public AudioClip shootSound;
+    [SerializeField] public GameObject greenCrawler;
+    [SerializeField] public GameObject purpleCrawler;
+    [SerializeField] public GameObject orangeCrawler;
+    [SerializeField] public GameObject greenEgg;
+    [SerializeField] public GameObject purpleEgg;
+    [SerializeField] public GameObject orangeEgg;
+    [SerializeField] public healthbarController healthbar;
 
     private int health;
+    private int maxHealth;
     private float speed;
     float SavedTime = 0;
     float DelayTime = 1.3f;
+    float DelayTime2 = 1.0f;
+    float DelayTime3 = 0.8f;
 
     //For green Boss movement
 
@@ -28,15 +38,21 @@ public class crawlerMovement : MonoBehaviour
     private bool resting = false;
     public bool greenRange = false;
     public bool greenArena = false;
+    public bool orangeArena = false;
+    public bool orangeRange = false;
+    public int callInFightOnce = 1;
 
     //FOR purple boss
 
     private bool inFight = false;
     private float movemenetSpeed;
     private Vector2[] pathList = new Vector2[8];
+    
     private Vector2 currentVect;
     private int currentPoint;
     private bool pathing = true;
+    private bool spawning = true;
+    private bool inFight2 = false;
 
 
     // Start is called before the first frame update
@@ -53,36 +69,48 @@ public class crawlerMovement : MonoBehaviour
         pathList[7] = new Vector2(66.4f, -42.2f);
         
         target = GameObject.Find("player");
+        healthbar = transform.Find("HealthBar").GetComponent<healthbarController>();
         playerScript = target.GetComponent<moveExcavator>();
         if (this.gameObject.tag == "greenCrawler")
         {
+            maxHealth = 50;
             health = 50;
-            speed = 0.015f;
+            speed = 0.05f;
         } else if (this.gameObject.tag == "purpleCrawler")
         {
             health = 30;
-            speed = .02f;
+            maxHealth = 30;
+            speed = .075f;
         } else if (this.gameObject.tag == "orangeCrawler")
         {
             health = 80;
-            speed = .03f;
+            maxHealth = 80;
+            speed = .085f;
         } else if (this.gameObject.tag == "LeftBoss")
         {
-            
+            maxHealth = 500;
             health = 500;
         } else if(this.gameObject.tag == "rightBoss")
         {
+            maxHealth = 300;
             health = 300;
             currentVect = pathList[0];
             currentPoint = 0;
+        } else if(this.gameObject.tag == "finalBoss")
+        {
+            maxHealth = 750;
+            health = 750;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-       // Debug.Log(greenArena);
+        Debug.Log("Arena: " + orangeArena);
+        Debug.Log("Range: " + orangeRange);
+        // Debug.Log(greenArena);
         //Debug.Log(greenRange);
+        //Green Boss
         if (target != null && target.GetComponent<moveExcavator>().paused != true) 
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed);
@@ -93,29 +121,110 @@ public class crawlerMovement : MonoBehaviour
                 float distanceToPlayer = (transform.position - target.transform.position).magnitude;
                 if(distanceToPlayer <= 15 && greenArena == true)
                 {
-                    
+                    if (callInFightOnce == 1)
+                    {
+                       // target.GetComponent<moveExcavator>().inFight = true;
+                       // target.GetComponent<moveExcavator>().inFightChange();
+
+                        callInFightOnce = 0;
+                    }
                     OnTriggerStay();
+                    
                     if (greenRange == true && resting == false)
                     {
                         //transform.position = Vector2.MoveTowards(transform.position, target.transform.position, 0.01f);
-                        StartCoroutine("moveAttackEnum");
+                        StartCoroutine("moveAttackEnum", 5);
+                    }
+                }
+                else
+                {
+                    if (callInFightOnce == 0)
+                    {
+
+                       // target.GetComponent<moveExcavator>().inFight = false;
+                       // target.GetComponent<moveExcavator>().outFight();
+                        callInFightOnce = 1;
                     }
                 }
                 
             }
+            //Purple Boss
             if(this.gameObject.tag == "rightBoss")
             {
-                if (!inFight)
+                
+                float distanceToPlayer = (transform.position - target.transform.position).magnitude;
+                if (distanceToPlayer <= 15 )
                 {
-                    transform.position = Vector2.MoveTowards(transform.position, pathList[currentPoint], 1000);
-                    if (pathing)
+                    if (callInFightOnce == 1)
                     {
-                        StartCoroutine(followPath(this.gameObject));
+                        inFight = true;
+                       // target.GetComponent<moveExcavator>().inFight = true;
+                       // target.GetComponent<moveExcavator>().inFightChange();
+                        callInFightOnce = 0;
+                    }
+
+
+                }
+                else
+                {
+                    if (callInFightOnce == 0)
+                    {
+                        inFight = false;
+                       // target.GetComponent<moveExcavator>().inFight = false;
+                       // target.GetComponent<moveExcavator>().outFight();
+                        callInFightOnce = 1;
+                    }
+                }
+                    if (!inFight)
+                {
+                    
+                        if (pathing)
+                    {
+                        //StartCoroutine(followPath(this.gameObject));
+                        StartCoroutine("moveAttackEnum2");
                     }
 
                 } else
                 {
+                    OnTriggerStay2();
+                    if (spawning)
+                    {
+                        StartCoroutine("spawnCrawler", this.gameObject);
+                    }
+                }
+            }
 
+            //Orange Boss
+            if(this.gameObject.tag == "finalBoss")
+            {
+             
+
+                float distanceToPlayer = (transform.position - target.transform.position).magnitude;
+                
+                if (distanceToPlayer <= 25 && orangeRange == true)
+                {
+                    if (callInFightOnce == 1)
+                    {
+                       // target.GetComponent<moveExcavator>().inFight = true;
+                       // target.GetComponent<moveExcavator>().inFightChange();
+                       // callInFightOnce = 0;
+                    }
+                    StartCoroutine("spawnCrawler", this.gameObject);
+                    OnTriggerStay3();
+                    if (orangeArena == true && resting == false)
+                    {
+                        //transform.position = Vector2.MoveTowards(transform.position, target.transform.position, 0.01f);
+                        StartCoroutine("moveAttackEnum", 3);
+                    }
+                }
+                else
+                {
+                    if (callInFightOnce == 0)
+                    {
+                       // target.GetComponent<moveExcavator>().inFight = false;
+                       // target.GetComponent<moveExcavator>().outFight();
+                       // callInFightOnce = 1;
+                    }
                 }
             }
         }
@@ -125,48 +234,75 @@ public class crawlerMovement : MonoBehaviour
         }
         
     }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if(collision.gameObject.tag == "greenBounce")
-        {
-          
-        }
-    }
+    
 
     public void takeDamage(int dmg)
     {
         health -= dmg;
+        healthbar.setSize((float)health / (float)maxHealth);
         playerScript.addDamageCount();
         
     }
 
-    IEnumerator moveAttackEnum()
+    IEnumerator moveAttackEnum(float secs)
     {
         
         Vector2 tar = target.transform.position;
-        Vector2 current = transform.position;
+        //Vector2 current = transform.position;
         resting = true;
         //while (transform.position.x != tar.x && transform.position.y != tar.y)
         //{
         if (target.GetComponent<moveExcavator>().paused != true)
         {
             AudioSource.PlayClipAtPoint(moveAttackSound, target.transform.position);
-            StartCoroutine(MoveTo(transform, tar, 5));
+            StartCoroutine(MoveTo(transform, tar, secs));
         }
        // }
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(secs);
 
         resting = false;
 
        
         
     }
+    IEnumerator moveAttackEnum2()
+    {
+        Vector2 tar;
+        if (currentPoint == 7)
+        {
+            tar = pathList[0];
+            currentPoint = 0;
+
+        }
+        else
+        {
+            tar = pathList[currentPoint + 1];
+            currentPoint++;
+        }
+       
+        //Vector2 current = transform.position;
+        pathing = false;
+        //while (transform.position.x != tar.x && transform.position.y != tar.y)
+        //{
+        if (target.GetComponent<moveExcavator>().paused != true)
+        {
+           // AudioSource.PlayClipAtPoint(moveAttackSound, target.transform.position);
+            StartCoroutine(MoveTo(transform, tar, 5));
+        }
+        // }
+        yield return new WaitForSeconds(5);
+
+        pathing = true;
+
+
+
+    }
 
     IEnumerator MoveTo(Transform mover, Vector2 destination, float speed)
     {
         // This looks unsafe, but Unity uses
         // en epsilon when comparing vectors.
-        while ((Vector2)mover.position != destination && inFight != true)
+        while ((Vector2)mover.position != destination )
         {
             mover.position = Vector2.MoveTowards(
                 mover.position,
@@ -175,6 +311,23 @@ public class crawlerMovement : MonoBehaviour
             // Wait a frame and move again.
             yield return null;
         }
+    }
+
+    //SpawnEnemies around
+    IEnumerator spawnCrawler(GameObject boss)
+    {
+        
+        spawning = false;
+        if(boss.tag == "rightBoss")
+        {
+            Instantiate(purpleEgg, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+        }
+        else if(boss.tag == "finalBoss")
+        {
+            Instantiate(orangeEgg, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+        }
+        yield return new WaitForSeconds(5);
+        spawning = true;
     }
 
     void OnTriggerStay()
@@ -192,6 +345,37 @@ public class crawlerMovement : MonoBehaviour
         }
 
     }
+    void OnTriggerStay2()
+    {
+
+        if ((Time.time - SavedTime) > DelayTime2)
+        {
+            SavedTime = Time.time;
+
+            //Anything in here will be called every two seconds        
+            GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+            AudioSource.PlayClipAtPoint(shootSound, transform.position);
+            go.GetComponent<projectileMove>().getProjectieInfo(target.transform.position, 50, 0.08f, this.gameObject);
+
+        }
+
+    }
+    void OnTriggerStay3()
+    {
+
+        if ((Time.time - SavedTime) > DelayTime3)
+        {
+            SavedTime = Time.time;
+
+            //Anything in here will be called every two seconds        
+            GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+            AudioSource.PlayClipAtPoint(shootSound, transform.position);
+            go.GetComponent<projectileMove>().getProjectieInfo(target.transform.position, 50, 0.09f, this.gameObject);
+
+        }
+
+    }
+
 
     public float getHealth()
     {
@@ -200,14 +384,22 @@ public class crawlerMovement : MonoBehaviour
 
     public void setGreenArena(bool a)
     {
-        Debug.Log("calledsetArena");
+       
         greenArena = a;
     }
 
     public void setGreenRange(bool a)
     {
-        Debug.Log("calledsetrange");
+        
         greenRange = a;
+    }
+    public void setOrangeArena(bool a)
+    {
+        orangeArena = a;
+    }
+    public void setOrangeRange(bool a)
+    {
+        orangeRange = a;
     }
     private void OnDestroy()
     {
@@ -236,23 +428,6 @@ public class crawlerMovement : MonoBehaviour
     }
 
 
-    IEnumerator followPath(GameObject monster)
-    {
-        pathing = false;
-        if(currentPoint == 7)
-        {
-            MoveTo(monster.transform, pathList[0], 5);
-            currentPoint = 0;
-            
-        } else
-        {
-            MoveTo(monster.transform, pathList[currentPoint+1], 5);
-            currentPoint++;
-        }
-        
-
-        yield return new WaitForSeconds(5);
-        pathing = true;
-    }
+    
     
 }
