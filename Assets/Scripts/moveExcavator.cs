@@ -34,6 +34,11 @@ public class moveExcavator : MonoBehaviour
     public GameObject rightBoss;
     public GameObject finalBoss;
 
+    //Texts +1
+    public Text bronzeCue;
+    public Text silverCue;
+    public Text goldCue;
+
 
 
 
@@ -53,13 +58,13 @@ public class moveExcavator : MonoBehaviour
     private int damage = 10;
 
     //Resources
-    int bronzeScore = 0;
-    int silverScore = 0;
-    int goldScore = 0;
+    int bronzeScore = 100;
+    int silverScore = 100;
+    int goldScore =100;
     int gas = 100;
-    int greenGoo = 0;
-    int purpleGoo = 0;
-    int orangeGoo = 0;
+    int greenGoo = 10;
+    int purpleGoo = 10;
+    int orangeGoo = 10;
 
     //animations
     [SerializeField] private Animator myAnim;
@@ -106,6 +111,12 @@ public class moveExcavator : MonoBehaviour
     private int disablehst = 0;
     private bool end = false;
     private bool endAndHS = false;
+    private bool healing = false;
+    private bool healingHelper = false;
+    private bool deplete = false;
+    private bool boost = false;
+    private bool fireSpeed = false;
+    
 
 
 
@@ -317,14 +328,37 @@ public class moveExcavator : MonoBehaviour
             //mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
             //crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
 
-            if (joystickshoot.Horizontal != 0 && joystickshoot.Vertical != 0 && shooting == false)
+            if (joystickshoot.Horizontal != 0 && joystickshoot.Vertical != 0 && shooting == false )
             {
                 StartCoroutine("shoot");
             }
 
         }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+           if (greenGoo > 0 && deplete == false)
+            {
+                StartCoroutine("depleteGoo", 0);
 
+                
+            }
 
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            if(purpleGoo > 0 && boost == false)
+            {
+                StartCoroutine("boostSpeed");
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            if(orangeGoo > 0 && deplete == false)
+            {
+                StartCoroutine("depleteGoo", 2);
+            }
+        }
+       
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -340,31 +374,73 @@ public class moveExcavator : MonoBehaviour
                
             } else if (tempString.Equals("bronze")) {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(bronzeCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 bronzeScore++;
 
             } else if (tempString.Equals("silver"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(silverCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 silverScore++;
             } else if (tempString.Equals("gold"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 goldScore++;
             } else if (tempString.Equals("goldgreenCrawler"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 goldScore++;
                 Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
             }
             else if (tempString.Equals("goldpurpleCrawler"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 goldScore++;
                 Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
             }
             else if (tempString.Equals("goldorangeCrawler"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
+                Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
+                //Parent to the panel
+                tempTextBox.transform.SetParent(mainUI.transform, false);
+                //Set the text box's text element font size and style:
+                tempTextBox.fontSize = 20;
+                //Set the text box's text element to the current textToDisplay:
+                tempTextBox.text = "+1";
                 goldScore++;
                 Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
             } else
@@ -585,7 +661,7 @@ public class moveExcavator : MonoBehaviour
                 case 2:
                     if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
                     {
-                        speed += 2;
+                        speed += 1;
                         speedLvl++;
                         discountCost(a);
                         spc.bronze += 5;
@@ -596,7 +672,7 @@ public class moveExcavator : MonoBehaviour
                 case 3:
                     if (bronzeScore >= spc.bronze && silverScore >= spc.silver && goldScore >= spc.gold)
                     {
-                        speed += 3;
+                        speed += 1;
                         speedLvl++;
                         discountCost(a);
                         spc.bronze = 0;
@@ -618,6 +694,7 @@ public class moveExcavator : MonoBehaviour
                     if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
                     {
                         spotLight.spotAngle += 3;
+                        cam.orthographicSize = 6;
                         LRlvl++;
                         discountCost(a);
                         lrc.bronze += 3;
@@ -631,6 +708,7 @@ public class moveExcavator : MonoBehaviour
                     if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
                     {
                         spotLight.spotAngle += 4;
+                        cam.orthographicSize = 7;
                         LRlvl++;
                         discountCost(a);
                         lrc.bronze += 5;
@@ -643,6 +721,7 @@ public class moveExcavator : MonoBehaviour
                     if (bronzeScore >= lrc.bronze && silverScore >= lrc.silver && goldScore >= lrc.gold)
                     {
                         spotLight.spotAngle += 5;
+                        cam.orthographicSize = 8;
                         LRlvl++;
                         discountCost(a);
                         lrc.bronze = 0;
@@ -792,6 +871,26 @@ public class moveExcavator : MonoBehaviour
             end = true;
         }
     }
+    public void healHealth(int healing)
+    {
+        int temp = health + healing;
+        if (health == maxHealth)
+        {
+
+        }
+        else if (temp >= maxHealth)
+        {
+            health = maxHealth;
+            healthbar.setSize((float)health / maxHealth);
+        }
+        else
+        {
+            health += healing;
+            healthbar.setSize((float)health / maxHealth);
+
+        }
+
+    }
 
 
     public void discountCost(int a)
@@ -897,11 +996,96 @@ public class moveExcavator : MonoBehaviour
         GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
         AudioSource.PlayClipAtPoint(shootSound, transform.position);
         go.GetComponent<projectileMove>().getProjectieInfo(
-            new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), damage, 0.1f, this.gameObject);
-        yield return new WaitForSeconds(1f);
+            new Vector2(joystickshoot.Horizontal, joystickshoot.Vertical), damage, 0.35f, this.gameObject);
+        if (fireSpeed == false)
+        {
+
+
+            yield return new WaitForSeconds(1f);
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.4f);
+        }
+        
         shooting = false;
     }
+   
 
 
-    
+    IEnumerator heal()
+    {
+        healingHelper = true;
+        Debug.Log("Called2");
+        
+        healHealth(5);
+        yield return new WaitForSeconds(2f);
+        healingHelper = false;
+
+    }
+
+    IEnumerator depleteGoo(int goo)
+    {
+        
+        
+            Debug.Log("Called");
+            deplete = true;
+            if (goo == 0 && greenGoo > 0)
+            {
+                greenGoo--;
+                if (healingHelper == false)
+                {
+                    StartCoroutine("heal");
+                }
+            updateGooText();
+            yield return new WaitForSeconds(1f);
+            deplete = false;
+            StartCoroutine("depleteGoo", goo);
+        }
+            else if (goo == 1 && purpleGoo > 0)
+            {
+                purpleGoo--;
+                if(boost == false)
+                {
+                StartCoroutine("boostSpeed");
+                } 
+                
+            }
+            else if (goo == 2 && orangeGoo >0)
+            {
+                //Coroutine?
+                fireSpeed = true;
+                orangeGoo--;
+                if(orangeGoo == 0)
+                {
+                    fireSpeed = false;
+                }
+            updateGooText();
+            yield return new WaitForSeconds(1f);
+            deplete = false;
+            StartCoroutine("depleteGoo", goo);
+
+        }
+        else
+        {
+
+        }
+           
+       
+        
+
+
+    }
+
+    IEnumerator boostSpeed()
+    {
+        boost = true;
+        speed += 5;
+        yield return new WaitForSeconds(1f);
+        speed -= 5;
+        boost = false;
+    }
+
+   
+
 }
