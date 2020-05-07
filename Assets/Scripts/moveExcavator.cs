@@ -16,6 +16,7 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public AudioClip all;
     [SerializeField] public AudioClip boss;
     [SerializeField] public AudioClip endSound;
+
     [SerializeField] public GameObject overheat;
     [SerializeField] public Joystick joystick;
     [SerializeField] public Joystick joystickshoot;
@@ -28,7 +29,14 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject highscoreTable;
     [SerializeField] public GameObject highscoreTableReal;
     [SerializeField] public GameObject enterName;
+    [SerializeField] public GameObject endPanel;
+    public GameObject drill;
 
+    //Particles
+    public ParticleSystem greenPart;
+    public ParticleSystem purplePart;
+    public ParticleSystem orangePart;
+    private ParticleSystem myPart;
 
     public GameObject leftBoss;
     public GameObject rightBoss;
@@ -50,6 +58,10 @@ public class moveExcavator : MonoBehaviour
     public AudioClip oreCollected;
     public AudioClip crashSound;
     public AudioClip shootSound;
+    public AudioClip buffUp;
+    public AudioClip debuff;
+    public AudioClip boostSound;
+    public AudioClip magicalAmbiance;
 
     //Excavator capabilities
     int speed = 2;
@@ -58,13 +70,13 @@ public class moveExcavator : MonoBehaviour
     private int damage = 10;
 
     //Resources
-    int bronzeScore = 100;
-    int silverScore = 100;
-    int goldScore =100;
+    int bronzeScore = 20;
+    int silverScore = 10;
+    int goldScore = 10;
     int gas = 100;
-    int greenGoo = 10;
-    int purpleGoo = 10;
-    int orangeGoo = 10;
+    int greenGoo = 0;
+    int purpleGoo = 0;
+    int orangeGoo = 0;
 
     //animations
     [SerializeField] private Animator myAnim;
@@ -116,6 +128,7 @@ public class moveExcavator : MonoBehaviour
     private bool deplete = false;
     private bool boost = false;
     private bool fireSpeed = false;
+    private bool inPowerUpSong = false;
     
 
 
@@ -213,6 +226,8 @@ public class moveExcavator : MonoBehaviour
         crosshair.SetActive(false);
         overheat.SetActive(false);
         shootJoy.SetActive(false);
+        endPanel.SetActive(false);
+        moveJoy.SetActive(false);
 
     }
 
@@ -228,7 +243,7 @@ public class moveExcavator : MonoBehaviour
         }
         if (end && !endAndHS)
         {
-
+            endPanel.SetActive(true);
             AudioSource.PlayClipAtPoint(endSound, transform.position);
             paused = true;
 
@@ -244,8 +259,12 @@ public class moveExcavator : MonoBehaviour
             //Arrow movement
             if (transform.position.y < 2.5)
             {
-                // transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
-                transform.Translate(joystick.Horizontal * speed * Time.deltaTime, joystick.Vertical * speed * Time.deltaTime, 0f);
+                 transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
+                if(Input.GetAxis("Horizontal") > 0 || Input.GetAxis("Vertical") > 0)
+                {
+                    drill.transform.rotation = Quaternion.LookRotation(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")), Vector3.forward);
+                }
+               // transform.Translate(joystick.Horizontal * speed * Time.deltaTime, joystick.Vertical * speed * Time.deltaTime, 0f);
             }
             //Touch
             /* if (Input.touchCount > 0) {
@@ -323,25 +342,30 @@ public class moveExcavator : MonoBehaviour
         if (gunActivated == true)
         {
 
-            //crosshair.SetActive(true);
+            crosshair.SetActive(true);
 
-            //mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            //crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
-
-            if (joystickshoot.Horizontal != 0 && joystickshoot.Vertical != 0 && shooting == false )
+             mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            crosshair.transform.position = (new Vector3(mousePos.x, mousePos.y, transform.position.z));
+            if (Input.GetMouseButtonDown(0) && shooting == false)
             {
-                StartCoroutine("shoot");
+                StartCoroutine("shootMouse");
             }
+           // if (joystickshoot.Horizontal != 0 && joystickshoot.Vertical != 0 && shooting == false )
+           // {
+            //    StartCoroutine("shoot");
+            //}
 
         }
         if (Input.GetKeyDown(KeyCode.H))
         {
            if (greenGoo > 0 && deplete == false)
             {
+                AudioSource.PlayClipAtPoint(buffUp, transform.position);
                 StartCoroutine("depleteGoo", 0);
-
                 
+
             }
+            
 
         }
         if (Input.GetKeyDown(KeyCode.V))
@@ -350,13 +374,16 @@ public class moveExcavator : MonoBehaviour
             {
                 StartCoroutine("boostSpeed");
             }
+            
         }
         if (Input.GetKeyDown(KeyCode.G))
         {
             if(orangeGoo > 0 && deplete == false)
             {
+                AudioSource.PlayClipAtPoint(buffUp, transform.position);
                 StartCoroutine("depleteGoo", 2);
             }
+           
         }
        
 
@@ -1010,7 +1037,27 @@ public class moveExcavator : MonoBehaviour
         
         shooting = false;
     }
-   
+    IEnumerator shootMouse()
+    {
+        shooting = true;
+        GameObject go = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+        AudioSource.PlayClipAtPoint(shootSound, transform.position);
+        go.GetComponent<projectileMove>().getProjectieInfo(
+            new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), damage, 0.35f, this.gameObject);
+        if (fireSpeed == false)
+        {
+
+
+            yield return new WaitForSeconds(1f);
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.4f);
+        }
+
+        shooting = false;
+    }
+
 
 
     IEnumerator heal()
@@ -1030,40 +1077,87 @@ public class moveExcavator : MonoBehaviour
         
             Debug.Log("Called");
             deplete = true;
-            if (goo == 0 && greenGoo > 0)
+            if (goo == 0 )
             {
+            if (greenGoo > 0)
+            {
+              //  if(inPowerUpSong == false)
+              //  {
+               //     inPowerUpSong = true;
+                 //   AudioSource.PlayClipAtPoint(magicalAmbiance, transform.position);
+               // }
+                myPart = Instantiate(greenPart, new Vector3(this.transform.position.x, this.transform.position.y, -1), Quaternion.identity);
+                
                 greenGoo--;
                 if (healingHelper == false)
                 {
                     StartCoroutine("heal");
                 }
-            updateGooText();
-            yield return new WaitForSeconds(1f);
-            deplete = false;
-            StartCoroutine("depleteGoo", goo);
-        }
-            else if (goo == 1 && purpleGoo > 0)
-            {
-                purpleGoo--;
-                if(boost == false)
-                {
-                StartCoroutine("boostSpeed");
-                } 
-                
+                updateGooText();
+                yield return new WaitForSeconds(1f);
+                deplete = false;
+                StartCoroutine("depleteGoo", goo);
             }
-            else if (goo == 2 && orangeGoo >0)
+            else
             {
+                
+                myPart = null;
+                deplete = false;
+                inPowerUpSong = false;
+                AudioSource.PlayClipAtPoint(debuff, transform.position);
+            }
+        }
+            else if (goo == 1 )
+            {
+
+            if (purpleGoo > 0)
+            {
+                myPart = Instantiate(purplePart, new Vector3(this.transform.position.x, this.transform.position.y, -1), Quaternion.identity);
+                purpleGoo--;
+                if (boost == false)
+                {
+                    StartCoroutine("boostSpeed");
+                }
+            }
+            else
+            {
+
+                myPart = null;
+            }
+
+        }
+            else if (goo == 2 )
+            {
+            if (orangeGoo > 0)
+            {
+
+               
+                
                 //Coroutine?
                 fireSpeed = true;
                 orangeGoo--;
-                if(orangeGoo == 0)
+               // if (inPowerUpSong == false)
+               // {
+                //    inPowerUpSong = true;
+                //    AudioSource.PlayClipAtPoint(magicalAmbiance, transform.position);
+               // }
+                if (orangeGoo == 0)
                 {
                     fireSpeed = false;
                 }
-            updateGooText();
-            yield return new WaitForSeconds(1f);
-            deplete = false;
-            StartCoroutine("depleteGoo", goo);
+                updateGooText();
+                yield return new WaitForSeconds(1f);
+                deplete = false;
+                StartCoroutine("depleteGoo", goo);
+            }
+            else
+            {
+                fireSpeed = false;
+                myPart = null;
+                deplete = false;
+                inPowerUpSong = false;
+                AudioSource.PlayClipAtPoint(debuff, transform.position);
+            }
 
         }
         else
@@ -1079,11 +1173,16 @@ public class moveExcavator : MonoBehaviour
 
     IEnumerator boostSpeed()
     {
+        myPart = Instantiate(purplePart, new Vector3(this.transform.position.x, this.transform.position.y, -1), Quaternion.identity);
+        AudioSource.PlayClipAtPoint(boostSound, transform.position);
         boost = true;
         speed += 5;
+        purpleGoo -= 2;
+        updateGooText();
         yield return new WaitForSeconds(1f);
         speed -= 5;
         boost = false;
+        myPart = null;
     }
 
    
