@@ -1,0 +1,67 @@
+fileFormatVersion: 2
+guid: dccf9bab7d19bce4d8915cc016bb46f7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - shootSound: {instanceID: 0}
+  - cam: {instanceID: 0}
+  - projectile: {fileID: 6056194087342683102, guid: c5a32ad5ff3c2884c98f432e685d31cf,
+      type: 3}
+  - crosshair: {instanceID: 0}
+  - drill: {instanceID: 0}
+  - obbyMat: {instanceID: 0}
+  - healthbar: {instanceID: 0}
+  - gasResource: {instanceID: 0}
+  - all: {instanceID: 0}
+  - boss: {instanceID: 0}
+  - endSound: {instanceID: 0}
+  - overheat: {instanceID: 0}
+  - joystick: {instanceID: 0}
+  - joystickshoot: {instanceID: 0}
+  - greenCrawler: {instanceID: 0}
+  - purpleCrawler: {instanceID: 0}
+  - orangeCrawler: {instanceID: 0}
+  - highscoreTable: {instanceID: 0}
+  - highscoreTableReal: {instanceID: 0}
+  - enterName: {instanceID: 0}
+  - endPanel: {instanceID: 0}
+  - greenPart: {instanceID: 0}
+  - purplePart: {instanceID: 0}
+  - orangePart: {instanceID: 0}
+  - leftBoss: {instanceID: 0}
+  - rightBoss: {instanceID: 0}
+  - finalBoss: {instanceID: 0}
+  - bronzeCue: {fileID: 3026898237301352690, guid: 8066656fda0471d4392ea8464d6dc153,
+      type: 3}
+  - silverCue: {fileID: 5134668177439805380, guid: ad3ee74af08ef3349bf72ce8e78558be,
+      type: 3}
+  - goldCue: {fileID: 9137106515650977355, guid: 6e4e630b7b6620948be459772270f5dc,
+      type: 3}
+  - soundSource: {instanceID: 0}
+  - BGSound: {instanceID: 0}
+  - ArenaSound: {instanceID: 0}
+  - oreCollected: {instanceID: 0}
+  - crashSound: {instanceID: 0}
+  - buffUp: {instanceID: 0}
+  - debuff: {instanceID: 0}
+  - boostSound: {instanceID: 0}
+  - magicalAmbiance: {instanceID: 0}
+  - myAnim: {instanceID: 0}
+  - inputField: {instanceID: 0}
+  - state1: {instanceID: 0}
+  - state2: {instanceID: 0}
+  - state3: {instanceID: 0}
+  - state4: {instanceID: 0}
+  - state5: {instanceID: 0}
+  - state6: {instanceID: 0}
+  - state7: {instanceID: 0}
+  - state8: {instanceID: 0}
+  - state9: {instanceID: 0}
+  - state10: {instanceID: 0}
+  - state11: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

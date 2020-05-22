@@ -60,7 +60,7 @@ public class projectileMove : MonoBehaviour
         if (Emitter != collision.gameObject)
         {
             //NEED TO MAKE ARRAY WITH ALL ENEMY GAMEOBJECTS
-            if (collision.gameObject.tag == "greenCrawler" || collision.gameObject.tag == "orangeCrawler" || collision.gameObject.tag == "purpleCrawler" || collision.gameObject.tag == "LeftBoss")
+            if (collision.gameObject.tag == "greenCrawler" || collision.gameObject.tag == "orangeCrawler" || collision.gameObject.tag == "purpleCrawler" || collision.gameObject.tag == "LeftBoss" || collision.gameObject.tag == "rightBoss" || collision.gameObject.tag == "finalBoss")
             {
                 Debug.Log(collision.gameObject.GetComponent<crawlerMovement>().getHealth());
                 collision.gameObject.GetComponent<crawlerMovement>().takeDamage(damage);

@@ -31,12 +31,14 @@ public class moveExcavator : MonoBehaviour
     [SerializeField] public GameObject enterName;
     [SerializeField] public GameObject endPanel;
     public GameObject drill;
+    public ParticleSystem victoryFire;
 
     //Particles
     public ParticleSystem greenPart;
     public ParticleSystem purplePart;
     public ParticleSystem orangePart;
     private ParticleSystem myPart;
+    public ParticleSystem explo;
 
     public GameObject leftBoss;
     public GameObject rightBoss;
@@ -48,7 +50,11 @@ public class moveExcavator : MonoBehaviour
     public Text goldCue;
 
 
-
+    //Win State
+    private bool greenKilled = false;
+    private bool purpleKilled = true;
+    private bool orangeKilled = true;
+    private bool win;
 
     Light spotLight;
     //Sound
@@ -65,18 +71,18 @@ public class moveExcavator : MonoBehaviour
 
     //Excavator capabilities
     int speed = 2;
-    private int maxHealth = 100;
-    private int health = 100;
-    private int damage = 10;
+    private int maxHealth = 10;
+    private int health = 10;
+    private int damage = 50;
 
     //Resources
-    int bronzeScore = 20;
-    int silverScore = 10;
-    int goldScore = 10;
+    int bronzeScore = 120;
+    int silverScore = 110;
+    int goldScore = 110;
     int gas = 100;
-    int greenGoo = 0;
-    int purpleGoo = 0;
-    int orangeGoo = 0;
+    int greenGoo = 100;
+    int purpleGoo = 100;
+    int orangeGoo = 100;
 
     //animations
     [SerializeField] private Animator myAnim;
@@ -108,6 +114,7 @@ public class moveExcavator : MonoBehaviour
     Text greenCost;
     Text purpleCost;
     Text orangeCost;
+    public Text EndGameText;
 
     bool panelActive = false;
 
@@ -234,6 +241,13 @@ public class moveExcavator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(greenKilled == true && purpleKilled == true && orangeKilled == true)
+        {
+            EndGameText.text = "Victory!";
+            end = true;
+            win = true;
+
+        }
 
         if (disablehst != 1) {
             highscoreTable.SetActive(false);
@@ -243,9 +257,20 @@ public class moveExcavator : MonoBehaviour
         }
         if (end && !endAndHS)
         {
-            endPanel.SetActive(true);
-            AudioSource.PlayClipAtPoint(endSound, transform.position);
+            Cursor.visible = true;
             paused = true;
+            if (win)
+            {
+                endPanel.SetActive(true);
+                Instantiate(victoryFire, new Vector2(transform.position.x - 5, transform.position.y - 10), Quaternion.identity);
+                Instantiate(victoryFire, new Vector2(transform.position.x + 5, transform.position.y - 10), Quaternion.identity);
+            }
+            else
+            {
+                endPanel.SetActive(true);
+                AudioSource.PlayClipAtPoint(endSound, transform.position, 0.1f);
+            }
+            
 
             enterName.SetActive(!endAndHS);
             inputField = GameObject.Find("InputField").GetComponent<InputField>();
@@ -260,7 +285,7 @@ public class moveExcavator : MonoBehaviour
             if (transform.position.y < 2.5)
             {
                  transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime, 0f);
-                if(Input.GetAxis("Horizontal") > 0 || Input.GetAxis("Vertical") > 0)
+                if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
                 {
                     drill.transform.rotation = Quaternion.LookRotation(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")), Vector3.forward);
                 }
@@ -323,10 +348,10 @@ public class moveExcavator : MonoBehaviour
             panel.SetActive(!panelActive);
             mainUI.SetActive(panelActive);
             panelActive = !panelActive;
-            moveJoy.SetActive(!moveJoy.active);
+            //moveJoy.SetActive(!moveJoy.active);
             if (gunActivated)
             {
-                shootJoy.SetActive(!shootJoy.active);
+                //shootJoy.SetActive(!shootJoy.active);
             }
             Cursor.visible = !Cursor.visible;
             paused = !paused;
@@ -829,7 +854,7 @@ public class moveExcavator : MonoBehaviour
                 case 1:
                     if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
                     {
-                        damage += 10;
+                       // damage += 10;
                         weaponlvl++;
                         discountCost(a);
                         wpc.bronze += 4;
@@ -841,7 +866,7 @@ public class moveExcavator : MonoBehaviour
                 case 2:
                     if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
                     {
-                        damage += 10;
+                        //damage += 10;
                         weaponlvl++;
                         discountCost(a);
                         wpc.bronze += 0;
@@ -895,7 +920,10 @@ public class moveExcavator : MonoBehaviour
         AudioSource.PlayClipAtPoint(crashSound, transform.position);
         if (health <= 0)
         {
+            Instantiate(explo, transform.position, Quaternion.identity);
+            Destroy(drill);
             end = true;
+            
         }
     }
     public void healHealth(int healing)
@@ -955,10 +983,10 @@ public class moveExcavator : MonoBehaviour
         panel.SetActive(!panelActive);
         mainUI.SetActive(panelActive);
         panelActive = !panelActive;
-        moveJoy.SetActive(!moveJoy.active);
+       // moveJoy.SetActive(!moveJoy.active);
         if (gunActivated)
         {
-            shootJoy.SetActive(!shootJoy.active);
+           // shootJoy.SetActive(!shootJoy.active);
         }
         Cursor.visible = !Cursor.visible;
         paused = !paused;
@@ -1044,15 +1072,19 @@ public class moveExcavator : MonoBehaviour
         AudioSource.PlayClipAtPoint(shootSound, transform.position);
         go.GetComponent<projectileMove>().getProjectieInfo(
             new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), damage, 0.35f, this.gameObject);
-        if (fireSpeed == false)
+        if (weaponlvl == 1)
         {
 
 
             yield return new WaitForSeconds(1f);
         }
-        else
+        else if (weaponlvl == 2)
         {
             yield return new WaitForSeconds(0.4f);
+        }
+        else if(weaponlvl == 3)
+        {
+            yield return new WaitForSeconds(0.2f);
         }
 
         shooting = false;
@@ -1131,10 +1163,10 @@ public class moveExcavator : MonoBehaviour
             if (orangeGoo > 0)
             {
 
-               
-                
+
+
                 //Coroutine?
-                fireSpeed = true;
+                damage += 30;
                 orangeGoo--;
                // if (inPowerUpSong == false)
                // {
@@ -1152,7 +1184,7 @@ public class moveExcavator : MonoBehaviour
             }
             else
             {
-                fireSpeed = false;
+                damage -= 30;
                 myPart = null;
                 deplete = false;
                 inPowerUpSong = false;
@@ -1185,6 +1217,17 @@ public class moveExcavator : MonoBehaviour
         myPart = null;
     }
 
-   
+   public void setGreenKilled(bool a)
+    {
+        greenKilled = a;
+    }
+    public void setPurpleKilled(bool a)
+    {
+        purpleKilled = a;
+    }
+    public void setOrangeKilled(bool a)
+    {
+        orangeKilled = a;
+    }
 
 }

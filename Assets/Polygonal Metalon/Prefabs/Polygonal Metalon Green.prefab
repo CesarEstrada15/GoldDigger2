@@ -1195,6 +1195,7 @@ MonoBehaviour:
   playerScript: {fileID: 0}
   moveAttackSound: {fileID: 0}
   shootSound: {fileID: 0}
+  deathSound: {fileID: 0}
   greenCrawler: {fileID: 0}
   purpleCrawler: {fileID: 0}
   orangeCrawler: {fileID: 0}
@@ -1396,6 +1397,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4900848959046628}
   - component: {fileID: 137914108728518260}
+  - component: {fileID: 8085422798142644881}
   m_Layer: 0
   m_Name: Polygonal Metalon
   m_TagString: greenCrawler
@@ -1493,6 +1495,25 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.5955523, y: 0.47306192, z: 0.000007748604}
     m_Extent: {x: 2.277113, y: 1.2932206, z: 2.1682854}
   m_DirtyAABB: 0
+--- !u!95 &8085422798142644881
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845593574226382}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ab2d01b7cf80201478554b0eee1e5c3b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1928140912258996
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,6 +15,10 @@ public class crawlerMovement : MonoBehaviour
     private bool paused;
     public AudioClip moveAttackSound;
     public AudioClip shootSound;
+    public AudioClip deathSound;
+    public GameObject eggFull;
+    public GameObject eggBroken;
+    [SerializeField] public ParticleSystem explo;
     [SerializeField] public GameObject greenCrawler;
     [SerializeField] public GameObject purpleCrawler;
     [SerializeField] public GameObject orangeCrawler;
@@ -22,6 +26,7 @@ public class crawlerMovement : MonoBehaviour
     [SerializeField] public GameObject purpleEgg;
     [SerializeField] public GameObject orangeEgg;
     [SerializeField] public healthbarController healthbar;
+   
 
     private int health;
     private int maxHealth;
@@ -200,16 +205,18 @@ public class crawlerMovement : MonoBehaviour
              
 
                 float distanceToPlayer = (transform.position - target.transform.position).magnitude;
-                
+
                 if (distanceToPlayer <= 25 && orangeRange == true)
                 {
                     if (callInFightOnce == 1)
                     {
-                       // target.GetComponent<moveExcavator>().inFight = true;
-                       // target.GetComponent<moveExcavator>().inFightChange();
-                       // callInFightOnce = 0;
+                        // target.GetComponent<moveExcavator>().inFight = true;
+                        // target.GetComponent<moveExcavator>().inFightChange();
+                        // callInFightOnce = 0;
                     }
+                    if (spawning) { 
                     StartCoroutine("spawnCrawler", this.gameObject);
+                    }
                     OnTriggerStay3();
                     if (orangeArena == true && resting == false)
                     {
@@ -287,7 +294,7 @@ public class crawlerMovement : MonoBehaviour
         if (target.GetComponent<moveExcavator>().paused != true)
         {
            // AudioSource.PlayClipAtPoint(moveAttackSound, target.transform.position);
-            StartCoroutine(MoveTo(transform, tar, 5));
+            StartCoroutine(MoveTo(transform, tar, 6));
         }
         // }
         yield return new WaitForSeconds(5);
@@ -320,13 +327,15 @@ public class crawlerMovement : MonoBehaviour
         spawning = false;
         if(boss.tag == "rightBoss")
         {
-            Instantiate(purpleEgg, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+            Instantiate(eggFull, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+            yield return new WaitForSeconds(5);
         }
         else if(boss.tag == "finalBoss")
         {
-            Instantiate(orangeEgg, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+            Instantiate(eggFull, transform.position + new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), Quaternion.identity);
+            yield return new WaitForSeconds(3);
         }
-        yield return new WaitForSeconds(5);
+       
         spawning = true;
     }
 
@@ -403,6 +412,7 @@ public class crawlerMovement : MonoBehaviour
     }
     private void OnDestroy()
     {
+       
         if(this.gameObject.tag == "LeftBoss")
         {
             if (this.getHealth() > 0)
@@ -410,10 +420,39 @@ public class crawlerMovement : MonoBehaviour
             }
             else
             {
+                target.GetComponent<moveExcavator>().setGreenKilled(true);
+                AudioSource.PlayClipAtPoint(deathSound, transform.position);
+                Instantiate(explo, transform.position, Quaternion.identity);
                 GameObject shieldDrop = Instantiate(obsidianshield, transform.position, Quaternion.identity) as GameObject;
             }
         }
-        if(this.gameObject.tag == "greenCrawler")
+        if(this.gameObject.tag == "rightBoss")
+        {
+            if (this.getHealth() > 0)
+            {
+            }
+            else
+            {
+                target.GetComponent<moveExcavator>().setPurpleKilled(true);
+                AudioSource.PlayClipAtPoint(deathSound, transform.position);
+                Instantiate(explo, this.gameObject.transform);
+               
+            }
+        }
+        if (this.gameObject.tag == "finalBoss")
+        {
+            if (this.getHealth() > 0)
+            {
+            }
+            else
+            {
+                target.GetComponent<moveExcavator>().setOrangeKilled(true);
+                AudioSource.PlayClipAtPoint(deathSound, transform.position);
+                Instantiate(explo, this.gameObject.transform);
+
+            }
+        }
+        if (this.gameObject.tag == "greenCrawler")
         {
             Instantiate(greenGoo, transform.position, Quaternion.identity);
         }

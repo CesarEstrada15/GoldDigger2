@@ -25,6 +25,9 @@ TagManager:
   - finalBoss
   - orangeArena
   - orangeRange
+  - Fire
+  - orangeBroken
+  - purpleBroken
   layers:
   - Default
   - TransparentFX
