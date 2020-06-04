@@ -26,6 +26,7 @@ public class crawlerMovement : MonoBehaviour
     [SerializeField] public GameObject purpleEgg;
     [SerializeField] public GameObject orangeEgg;
     [SerializeField] public healthbarController healthbar;
+    public cameraController camShake;
    
 
     private int health;
@@ -51,7 +52,7 @@ public class crawlerMovement : MonoBehaviour
 
     private bool inFight = false;
     private float movemenetSpeed;
-    private Vector2[] pathList = new Vector2[8];
+    private Vector2[] pathList = new Vector2[10];
     
     private Vector2 currentVect;
     private int currentPoint;
@@ -63,15 +64,18 @@ public class crawlerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        camShake = GameObject.Find("Main Camera").GetComponent<cameraController>();
         //moveAttackSound = Resources.Load<AudioClip>("Resources/BossScreech");
         pathList[0] = new Vector2(52.5f, -50f);
         pathList[1] = new Vector2(38.6f, -46.5f);
         pathList[2] = new Vector2(27f, -39f);
         pathList[3] = new Vector2(24.5f, -13f);
         pathList[4] = new Vector2(46.6f, -6f);
-        pathList[5] = new Vector2(88f, -6f);
-        pathList[6] = new Vector2(88f, -42f);
-        pathList[7] = new Vector2(66.4f, -42.2f);
+        pathList[5] = new Vector2(66.6f, -6f);
+        pathList[6] = new Vector2(88f, -6f);
+        pathList[7] = new Vector2(88f, -26f);
+        pathList[8] = new Vector2(88f, -42f);
+        pathList[9] = new Vector2(66.4f, -42.2f);
         
         target = GameObject.Find("player");
         healthbar = transform.Find("HealthBar").GetComponent<healthbarController>();
@@ -275,7 +279,7 @@ public class crawlerMovement : MonoBehaviour
     IEnumerator moveAttackEnum2()
     {
         Vector2 tar;
-        if (currentPoint == 7)
+        if (currentPoint == 9)
         {
             tar = pathList[0];
             currentPoint = 0;
@@ -412,8 +416,8 @@ public class crawlerMovement : MonoBehaviour
     }
     private void OnDestroy()
     {
-       
-        if(this.gameObject.tag == "LeftBoss")
+        
+        if (this.gameObject.tag == "LeftBoss")
         {
             if (this.getHealth() > 0)
             {
@@ -423,6 +427,7 @@ public class crawlerMovement : MonoBehaviour
                 target.GetComponent<moveExcavator>().setGreenKilled(true);
                 AudioSource.PlayClipAtPoint(deathSound, transform.position);
                 Instantiate(explo, transform.position, Quaternion.identity);
+                
                 GameObject shieldDrop = Instantiate(obsidianshield, transform.position, Quaternion.identity) as GameObject;
             }
         }
@@ -436,7 +441,8 @@ public class crawlerMovement : MonoBehaviour
                 target.GetComponent<moveExcavator>().setPurpleKilled(true);
                 AudioSource.PlayClipAtPoint(deathSound, transform.position);
                 Instantiate(explo, this.gameObject.transform);
-               
+                
+
             }
         }
         if (this.gameObject.tag == "finalBoss")
@@ -449,6 +455,7 @@ public class crawlerMovement : MonoBehaviour
                 target.GetComponent<moveExcavator>().setOrangeKilled(true);
                 AudioSource.PlayClipAtPoint(deathSound, transform.position);
                 Instantiate(explo, this.gameObject.transform);
+               
 
             }
         }

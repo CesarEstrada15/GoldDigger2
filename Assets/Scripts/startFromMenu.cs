@@ -16,6 +16,10 @@ public class startFromMenu : MonoBehaviour
         controls.SetActive(true);
         StartCoroutine("LoadYourAsyncScene");
     }
+    public void startutorial()
+    {
+        SceneManager.LoadScene(2);
+    }
     IEnumerator LoadYourAsyncScene()
     {
         // The Application loads the Scene in the background as the current Scene runs.
@@ -23,7 +27,7 @@ public class startFromMenu : MonoBehaviour
         // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
         // a sceneBuildIndex of 1 as shown in Build Settings.
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(0);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
 
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)
@@ -31,4 +35,5 @@ public class startFromMenu : MonoBehaviour
             yield return null;
         }
     }
+    
 }
