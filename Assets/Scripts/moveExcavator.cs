@@ -81,9 +81,9 @@ public class moveExcavator : MonoBehaviour
     private int damage = 20;
 
     //Resources
-    int bronzeScore = 100;
-    int silverScore = 100;
-    int goldScore = 100;
+    int bronzeScore = 0;
+    int silverScore = 0;
+    int goldScore = 0;
     int gas = 100;
     int greenGoo = 0;
     int purpleGoo = 0;
@@ -458,9 +458,12 @@ public class moveExcavator : MonoBehaviour
             
             string tempString = collision.gameObject.GetComponent<oreSelect>().getResult();
             Debug.Log(tempString);
-            if (tempString.Equals("n")) {
-               
-            } else if (tempString.Equals("bronze")) {
+            if (tempString.Equals("n"))
+            {
+
+            }
+            else if (tempString.Equals("bronze"))
+            {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                 Text tempTextBox = Instantiate(bronzeCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
                 //Parent to the panel
@@ -471,7 +474,8 @@ public class moveExcavator : MonoBehaviour
                 tempTextBox.text = "+1";
                 bronzeScore++;
 
-            } else if (tempString.Equals("silver"))
+            }
+            else if (tempString.Equals("silver"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                 Text tempTextBox = Instantiate(silverCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
@@ -482,7 +486,8 @@ public class moveExcavator : MonoBehaviour
                 //Set the text box's text element to the current textToDisplay:
                 tempTextBox.text = "+1";
                 silverScore++;
-            } else if (tempString.Equals("gold"))
+            }
+            else if (tempString.Equals("gold"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                 Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
@@ -493,7 +498,8 @@ public class moveExcavator : MonoBehaviour
                 //Set the text box's text element to the current textToDisplay:
                 tempTextBox.text = "+1";
                 goldScore++;
-            } else if (tempString.Equals("goldgreenCrawler"))
+            }
+            else if (tempString.Equals("goldgreenCrawler"))
             {
                 AudioSource.PlayClipAtPoint(oreCollected, collision.gameObject.transform.position);
                 Text tempTextBox = Instantiate(goldCue, new Vector2(transform.position.x - 5, transform.position.y + 5), Quaternion.identity) as Text;
@@ -504,7 +510,15 @@ public class moveExcavator : MonoBehaviour
                 //Set the text box's text element to the current textToDisplay:
                 tempTextBox.text = "+1";
                 goldScore++;
-                Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                int tempInt = Random.Range(0, 1);
+                if (tempInt == 1)
+                {
+                    Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(-10, -3), Random.Range(-10, -3), 0), Quaternion.identity);
+                }
+                else
+                {
+                    Instantiate(greenCrawler, collision.transform.position + new Vector3(Random.Range(3, 10), Random.Range(3, 10), 0), Quaternion.identity);
+                }
             }
             else if (tempString.Equals("goldpurpleCrawler"))
             {
@@ -517,7 +531,16 @@ public class moveExcavator : MonoBehaviour
                 //Set the text box's text element to the current textToDisplay:
                 tempTextBox.text = "+1";
                 goldScore++;
-                Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
+                int tempInt = Random.Range(0, 1);
+                if (tempInt == 1)
+                {
+                    Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(-10, -3), Random.Range(-10, -3), 0), Quaternion.identity);
+                }
+                else
+                {
+                    Instantiate(purpleCrawler, collision.transform.position + new Vector3(Random.Range(3, 10), Random.Range(3, 10), 0), Quaternion.identity);
+                }
+
             }
             else if (tempString.Equals("goldorangeCrawler"))
             {
@@ -530,8 +553,17 @@ public class moveExcavator : MonoBehaviour
                 //Set the text box's text element to the current textToDisplay:
                 tempTextBox.text = "+1";
                 goldScore++;
-                Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0), Quaternion.identity);
-            } else
+                int tempInt = Random.Range(0, 1);
+                if (tempInt == 1)
+                {
+                    Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(-10, -3), Random.Range(-10, -3), 0), Quaternion.identity);
+                }
+                else
+                {
+                    Instantiate(orangeCrawler, collision.transform.position + new Vector3(Random.Range(3, 10), Random.Range(3, 10), 0), Quaternion.identity);
+                }
+            }
+            else
             {
 
             }
@@ -874,7 +906,7 @@ public class moveExcavator : MonoBehaviour
             switch (weaponlvl)
             {
                 case 0:
-                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    if (bronzeScore >= wpc.bronze && silverScore >= wpc.silver && goldScore >= wpc.gold)
                     {
                         gunActivated = true;
 
@@ -888,7 +920,7 @@ public class moveExcavator : MonoBehaviour
                     }
                     break;
                 case 1:
-                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    if (bronzeScore >= wpc.bronze && silverScore >= wpc.silver && goldScore >= wpc.gold)
                     {
                        // damage += 10;
                         weaponlvl++;
@@ -900,14 +932,14 @@ public class moveExcavator : MonoBehaviour
                     }
                     break;
                 case 2:
-                    if (bronzeScore >= hpc.bronze && silverScore >= hpc.silver && goldScore >= hpc.gold)
+                    if (bronzeScore >= wpc.bronze && silverScore >= wpc.silver && goldScore >= wpc.gold)
                     {
                         //damage += 10;
                         weaponlvl++;
                         discountCost(a);
-                        wpc.bronze += 0;
-                        wpc.silver += 0;
-                        wpc.gold += 0;
+                        wpc.bronze = 0;
+                        wpc.silver = 0;
+                        wpc.gold = 0;
 
                     }
                     break;

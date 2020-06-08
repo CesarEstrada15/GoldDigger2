@@ -102,7 +102,7 @@ public class highScoreTable : MonoBehaviour
         int dd = hse.damageDealt;
         entryTransform.Find("DamageDealtEntry").GetComponent<Text>().text = dd.ToString();
         float time = hse.timePassed;
-        entryTransform.Find("TimeEntry").GetComponent<Text>().text = time.ToString();
+        entryTransform.Find("TimeEntry").GetComponent<Text>().text = Time.deltaTime.ToString();
 
         transformList.Add(entryTransform);
     }
